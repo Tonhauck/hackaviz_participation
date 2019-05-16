@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <style>
+    #chart {
+        background: #fff;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .title {
+        font-weight: bold;
+        font-size: 24px;
+        text-align: center;
+        margin-top: 6px;
+        margin-bottom: 6px;
+    }
+
+    text {
+        pointer-events: none;
+    }
+
+    .grandparent text {
+        font-weight: bold;
+    }
+
+    rect {
+        fill: none;
+        stroke: #fff;
+    }
+
+    rect.parent,
+    .grandparent rect {
+        stroke-width: 2px;
+    }
+
+    rect.parent {
+        pointer-events: none;
+    }
+
+    .grandparent rect {
+        fill: #CBD9D6;
+    }
+
+    .grandparent:hover rect {
+        fill: #A8E6CF;
+    }
+
+    .children rect.parent,
+    .grandparent rect {
+        cursor: pointer;
+    }
+
+    .children rect.parent {
+        fill: #bbb;
+        fill-opacity: .9;
+    }
+
+    .children:hover rect.child {
+        fill: #bbb;
+    }
+    </style>
+
+<body>
+    <div id="toolbar">
+        <button id="all" class="button active">All</button>
+        <button id="Location" class="button">By Location</button>
+        <button id="Group" class="button">By Group</button>
+        <button id="Class" class="button">By Class</button>
+        <button id="Type" class="button">By Type</button>
+    </div>
+    <div id="chart">
+    </div>
+    <script>
+    window.addEventListener('message', function(e) {
+        var opts = e.data.opts,
+            data = e.data.data;
+
+        return main(opts, data);
+    });
+
+    var defaults = {
+        margin: { top: 24, right: 0, bottom: 0, left: 0 },
+        rootname: "TOP",
+        format: ",d",
+        title: "",
+        width: 960,
+        height: 500
+    };
+
+    function main(o, data) {
+        var root,
+            opts = $.extend(true, {}, defaults, o),
+            formatNumber = d3.format(opts.format),
+            rname = opts.rootname,
+            margin = opts.margin,
+            theight = 36 + 16;
+
+        $('#chart').width(opts.width).height(opts.height);
+        var width = opts.width - margin.left - margin.right,
+            height = opts.height - margin.top - margin.bottom - theight,
+            transitioning;
+          
+          var colorSSS = d3.scale.category10();
+
+        
+        // green, blue, yellow, orange, red
+        var colors = ['#99B898','#FF847C','#FECEA8'];
+
+        // Do not include a domain
+        var color = d3.scale.ordinal()
+            .range(colors);
+
+        var x = d3.scale.linear()
+            .domain([0, width])
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .domain([0, height])
+            .range([0, height]);
+
+        var treemap = d3.layout.treemap()
+            .children(function(d, depth) { return depth ? null : d._children; })
+            .sort(function(a, b) { return a.value - b.value; })
+            .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
+            .round(false);
+
+        var svg = d3.select("#chart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.bottom + margin.top)
+            .style("margin-left", -margin.left + "px")
+            .style("margin.right", -margin.right + "px")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .style("shape-rendering", "crispEdges");
+
+        var grandparent = svg.append("g")
+            .attr("class", "grandparent");
+
+        grandparent.append("rect")
+            .attr("y", -margin.top)
+            .attr("width", width)
+            .attr("height", margin.top);
+
+        grandparent.append("text")
+            .attr("x", 6)
+            .attr("y", 6 - margin.top)
+            .attr("dy", ".75em");
+
+        if (opts.title) {
+            $("#chart").prepend("<p class='title'>" + opts.title + "</p>");
+        }
+        if (data instanceof Array) {
+            root = { key: rname, values: data };
+        } else {
+            root = data;
+        }
+
+        initialize(root);
+        accumulate(root);
+        layout(root);
+        console.log(root);
+        display(root);
+
+        if (window.parent !== window) {
+            var myheight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            window.parent.postMessage({ height: myheight }, '*');
+        }
+
+        function initialize(root) {
+            root.x = root.y = 0;
+            root.dx = width;
+            root.dy = height;
+            root.depth = 0;
+        }
+
+        // Aggregate the values for internal nodes. This is normally done by the
+        // treemap layout, but not here because of our custom implementation.
+        // We also take a snapshot of the original children (_children) to avoid
+        // the children being overwritten when when layout is computed.
+        function accumulate(d) {
+            return (d._children = d.values) ?
+                d.value = d.values.reduce(function(p, v) { return p + accumulate(v); }, 0) :
+                d.value;
+        }
+
+        // Compute the treemap layout recursively such that each group of siblings
+        // uses the same size (1×1) rather than the dimensions of the parent cell.
+        // This optimizes the layout for the current zoom state. Note that a wrapper
+        // object is created for the parent node for each group of siblings so that
+        // the parent’s dimensions are not discarded as we recurse. Since each group
+        // of sibling was laid out in 1×1, we must rescale to fit using absolute
+        // coordinates. This lets us use a viewport to zoom.
+        function layout(d) {
+            if (d._children) {
+                treemap.nodes({ _children: d._children });
+                d._children.forEach(function(c) {
+                    c.x = d.x + c.x * d.dx;
+                    c.y = d.y + c.y * d.dy;
+                    c.dx *= d.dx;
+                    c.dy *= d.dy;
+                    c.parent = d;
+                    layout(c);
+                });
+            }
+        }
+
+        function display(d) {
+            grandparent
+                .datum(d.parent)
+                .on("click", transition)
+                .select("text")
+                .text(name(d));
+
+            var g1 = svg.insert("g", ".grandparent")
+                .datum(d)
+                .attr("class", "depth");
+
+            var g = g1.selectAll("g")
+                .data(d._children)
+                .enter().append("g");
+
+            g.filter(function(d) { return d._children; })
+                .classed("children", true)
+                .on("click", transition);
+
+            var children = g.selectAll(".child")
+                .data(function(d) { return d._children || [d]; })
+                .enter().append("g");
+
+            children.append("rect")
+                .attr("class", "child")
+                .call(rect)
+                .append("title")
+                .text(function(d) { return d.key + " (" + formatNumber(d.value) + ")"; });
+            children.append("text")
+                .attr("class", "ctext")
+                .text(function(d) { return d.key; })
+                .call(text2);
+
+            g.append("rect")
+                .attr("class", "parent")
+                .call(rect);
+
+            var t = g.append("text")
+                .attr("class", "ptext")
+                .attr("dy", ".75em")
+
+            t.append("tspan")
+                .text(function(d) { return d.key; });
+            t.append("tspan")
+                .attr("dy", "1.0em")
+                .text(function(d) { return formatNumber(d.value); });
+            t.call(text);
+
+            g.selectAll("rect")
+                .style("fill", function(d) {
+                        if (d.categorie_majoritaire == undefined) {
+                            return  colorSSS(d.key)
+                        } else {
+                            return color(d.categorie_majoritaire);
+                        }
+                        });
+
+
+                    g
+                    .on("mouseover", function(d, i) {
+
+                        console.log(d.categorie_majoritaire);
+
+                        /*  // Get x & y co-ordinates
+                          console.log(d3.mouse(this));*/
+                    })
+                    .on("mouseout", function(d, i) {
+
+
+                    });
+
+                    function transition(d) {
+                        if (transitioning || !d) return;
+                        transitioning = true;
+
+                        var g2 = display(d),
+                            t1 = g1.transition().duration(750),
+                            t2 = g2.transition().duration(750);
+
+                        // Update the domain only after entering new elements.
+                        x.domain([d.x, d.x + d.dx]);
+                        y.domain([d.y, d.y + d.dy]);
+
+                        // Enable anti-aliasing during the transition.
+                        svg.style("shape-rendering", null);
+
+                        // Draw child nodes on top of parent nodes.
+                        svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
+
+                        // Fade-in entering text.
+                        g2.selectAll("text").style("fill-opacity", 0);
+
+                        // Transition to the new view.
+                        t1.selectAll(".ptext").call(text).style("fill-opacity", 0);
+                        t1.selectAll(".ctext").call(text2).style("fill-opacity", 0);
+                        t2.selectAll(".ptext").call(text).style("fill-opacity", 1);
+                        t2.selectAll(".ctext").call(text2).style("fill-opacity", 1);
+                        t1.selectAll("rect").call(rect);
+                        t2.selectAll("rect").call(rect);
+
+                        // Remove the old node when the transition is finished.
+                        t1.remove().each("end", function() {
+                            svg.style("shape-rendering", "crispEdges");
+                            transitioning = false;
+                        });
+                    }
+
+                    return g;
+                }
+
+            function text(text) {
+                text.selectAll("tspan")
+                    .attr("x", function(d) { return x(d.x) + 6; })
+                text.attr("x", function(d) { return x(d.x) + 6; })
+                    .attr("y", function(d) { return y(d.y) + 6; })
+                    .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+            }
+
+            function text2(text) {
+                text.attr("x", function(d) { return x(d.x + d.dx) - this.getComputedTextLength() - 6; })
+                    .attr("y", function(d) { return y(d.y + d.dy) - 6; })
+                    .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+            }
+
+            function rect(rect) {
+                rect.attr("x", function(d) { return x(d.x); })
+                    .attr("y", function(d) { return y(d.y); })
+                    .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+                    .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+            }
+
+            function name(d) {
+                return d.parent ?
+                    name(d.parent) + " / " + d.key + " (" + formatNumber(d.value) + ")" :
+                    d.key + " (" + formatNumber(d.value) + ")";
+            }
+        }
+
+        if (window.location.hash === "") {
+            d3.json("data.json", function(err, res) {
+                if (!err) {
+                    console.log(res);
+                    var data = d3.nest().key(function(d) { return d.subregion; }).entries(res);
+                    main({ title: "Région Occitanie" }, { key: "Région Occitanie", values: data });
+                }
+            });
+        }
+        /*    var w = 1800, h = 500;
+            console.clear()
+            var radius = 0.5;
+            var color = d3.scaleOrdinal(d3.schemeCategory20);
+            var centerScale = d3.scalePoint().padding(1).range([0, w]);
+            var forceStrength = 0.05;
+            
+            var svg = d3.select("body").append("svg")
+              .attr("width", w)
+              .attr("height", h)
+
+            var simulation = d3.forceSimulation()
+                    .force("collide",d3.forceCollide( function(d){
+                        return d.r + 2 }).iterations(16) 
+                    )
+                    .force("charge", d3.forceManyBody())
+                    .force("y", d3.forceY().y(h / 2))
+                    .force("x", d3.forceX().x(w / 2))
+            
+            d3.csv("convertcsv.csv", function(data){
+              
+              data.forEach(function(d){
+                d.r = radius;
+                d.x = w / 4;
+                d.y = h / 4;
+              })
+              
+              console.table(data); 
+                   
+              
+              
+              var circles = svg.selectAll("circle")
+                .data(data, function(d){ return d.ID ;});
+              
+              var circlesEnter = circles.enter().append("circle")
+                .attr("r", function(d, i){ return d.r; })
+                .attr("cx", function(d, i){ return 175 + 25 * i + 2 * i ** 2; })
+                        .attr("cy", function(d, i){ return 250; })
+                .style("fill", function(d, i){ return color(d.Location); })
+                .style("stroke", function(d, i){ return color(d.Location); })
+                .style("stroke-width", 5)
+                .style("pointer-events", "all")
+                .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));
+            
+              circles = circles.merge(circlesEnter)
+              
+              function ticked() {
+                //console.log("tick")
+                //console.log(data.map(function(d){ return d.x; }));
+                circles
+                    .attr("cx", function(d){ return d.x; })
+                    .attr("cy", function(d){ return d.y; });
+              }   
+
+              simulation
+                    .nodes(data)
+                    .on("tick", ticked);
+              
+              function dragstarted(d,i) {
+                //console.log("dragstarted " + i)
+                if (!d3.event.active) simulation.alpha(1).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+              }
+
+              function dragged(d,i) {
+                //console.log("dragged " + i)
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+              }
+
+              function dragended(d,i) {
+                //console.log("dragended " + i)
+                if (!d3.event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+                var me = d3.select(this)
+                console.log(me.classed("selected"))
+                me.classed("selected", !me.classed("selected"))
+                
+                d3.selectAll("circle")
+                  .style("fill", function(d, i){ return color(d.Location); })
+                
+                d3.selectAll("circle.selected")
+                  .style("fill", "none")
+                
+              } 
+              
+              function groupBubbles() {
+                hideTitles();
+
+                // @v4 Reset the 'x' force to draw the bubbles to the center.
+                simulation.force('x', d3.forceX().strength(forceStrength).x(w / 2));
+
+                // @v4 We can reset the alpha value and restart the simulation
+                simulation.alpha(1).restart();
+              }
+              
+              function splitBubbles(byVar) {
+                
+                centerScale.domain(data.map(function(d){ return d[byVar]; }));
+                
+                if(byVar == "all"){
+                  hideTitles()
+                } else {
+                    showTitles(byVar, centerScale);
+                }
+                
+                // @v4 Reset the 'x' force to draw the bubbles to their year centers
+                simulation.force('x', d3.forceX().strength(forceStrength).x(function(d){ 
+                    return centerScale(d[byVar]);
+                }));
+
+                // @v4 We can reset the alpha value and restart the simulation
+                simulation.alpha(2).restart();
+              }
+              
+              function hideTitles() {
+                svg.selectAll('.title').remove();
+              }
+
+              function showTitles(byVar, scale) {
+                // Another way to do this would be to create
+                // the year texts once and then just hide them.
+                var titles = svg.selectAll('.title')
+                  .data(scale.domain());
+                
+                titles.enter().append('text')
+                    .attr('class', 'title')
+                    .merge(titles)
+                    .attr('x', function (d) { return scale(d); })
+                    .attr('y', 40)
+                    .attr('text-anchor', 'middle')
+                    .text(function (d) { return byVar + ' ' + d; });
+                
+                titles.exit().remove() 
+              }
+              
+              function setupButtons() {
+                d3.selectAll('.button')
+                  .on('click', function () {
+                    
+                    // Remove active class from all buttons
+                    d3.selectAll('.button').classed('active', false);
+                    // Find the button just clicked
+                    var button = d3.select(this);
+
+                    // Set it as the active button
+                    button.classed('active', true);
+
+                    // Get the id of the button
+                    var buttonId = button.attr('id');
+
+                      console.log(buttonId)
+                    // Toggle the bubble chart based on
+                    // the currently clicked button.
+                    splitBubbles(buttonId);
+                  });
+              }
+              
+              setupButtons()
+              
+            })
+            */
+        //
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+        body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+.listing-group {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+font-weight: 600;
+position: absolute;
+top: 10px;
+right: 10px;
+z-index: 1;
+border-radius: 3px;
+max-width: 20%;
+color: #fff;
+}
+ 
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+html, body {
+  background: #ecf0f1;
+  color: #444;
+  font-family: Tahoma, Geneva, sans-serif;
+  font-size: 16px;
+  padding: 10px;
+}
+.button-switch {
+  font-size: 1.5em;
+  height: 1.875em;
+  margin-bottom: 0.625em;
+  position: relative;
+  width: 7em;
+}
+.button-switch .lbl-off, .button-switch .lbl-on {
+  cursor: pointer;
+  display: block;
+  font-size: 0.9em;
+  font-weight: bold;
+  line-height: 1em;
+  position: absolute;
+  top: 0.5em;
+  transition: opacity 0.25s ease-out 0.1s;
+  text-transform: uppercase;
+}
+.button-switch .lbl-off {
+  right: 0.4375em;
+}
+.button-switch .lbl-on {
+  color: #fefefe;
+  opacity: 0;
+  left: 0.4375em;
+}
+.button-switch .switch {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 0;
+  font-size: 1em;
+  left: 0;
+  line-height: 0;
+  outline: none;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+.button-switch .switch:before, .button-switch .switch:after {
+  content: '';
+  font-size: 1em;
+  position: absolute;
+}
+.button-switch .switch:before {
+  border-radius: 1.25em;
+  background: #3498db;
+  height: 1.875em;
+  left: -0.25em;
+  top: -0.1875em;
+  transition: background-color 0.25s ease-out 0.1s;
+  width: 7em;
+}
+.button-switch .switch:after {
+  box-shadow: 0 0.0625em 0.375em 0 #666;
+  border-radius: 50%;
+  background: #fefefe;
+  height: 1.5em;
+  transform: translate(0, 0);
+  transition: transform 0.25s ease-out 0.1s;
+  width: 1.5em;
+}
+.button-switch .switch:checked:after {
+  transform: translate(5em, 0);
+}
+.button-switch .switch:checked ~ .lbl-off {
+  opacity: 0;
+}
+.button-switch .switch:checked ~ .lbl-on {
+  opacity: 1;
+}
+.button-switch .switch#switch-orange:checked:before {
+  background: #e67e22;
+}
+
+
+
+
+</style>
+
+<body>
+    <div id='map'></div>
+    <nav id='listing-group' class='listing-group'>
+        <div class="button-switch">
+            <input type="checkbox" id="switch-orange" class="switch" checked />
+            <label for="switch-orange" class="lbl-off">Domicile</label>
+            <label for="switch-orange" class="lbl-on">Travail</label>
+        </div>
+        <div id="silder" class='session'>
+            <h2>Affichage des trajets dont le nombre de travailleurs actifs se déplaçant en voiture est inférieur à <label id='nombreActif'>190</label> déplacements</h2>
+            <input id='sliderTrajet' name="sliderTrajet" style="width:100%" class='slider' type='range' min='99' max='190' step='1' value='190' />
+        </div>
+    </nav>
+    <script>
+    const ALPHA = 0.01;
+
+    const rainbow = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    const rainbowInverse = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    function makeGradient(z, sens) {
+        if (sens == 'work') {
+            let gradient = rainbowInverse.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        } else {
+            let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        }
+        let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        gradient = gradient.concat([z, z - 0.02, z + 0.02].map(p => [p, undefined]));
+        gradient.sort((a, b) => a[0] - b[0]);
+
+        let which = 0;
+        for (let i = 0; i < gradient.length; i++) {
+            if (gradient[i][1]) continue;
+            gradient[i][1] = tween(i, which, gradient);
+            which++;
+            if (which === 3) break;
+        }
+
+        const deduped = gradient.reduce((a, stop, i) => {
+            if (i && a[a.length - 1][0] === stop[0]) {
+                if (stop[1][3] === 1) {
+                    a[a.length - 1][1][3] = 1;
+                }
+            } else {
+                if (stop[0] <= 1 || a[a.length - 1][1][3] !== 1)
+                    a.push(stop);
+            }
+
+            return a;
+        }, []).map(stop => [stop[0], `rgba(${stop[1].join(',')})`]);
+
+        return Array.prototype.concat.apply([
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+        ], deduped);
+    }
+
+    function tween(i, which, gradient) {
+        const x = gradient[i];
+        let prev = x,
+            next = x,
+            j = i,
+            jd = -1
+        k = i,
+            kd = 1;
+        while (!prev[1]) {
+            if (j === 0) jd *= -1;
+            j += jd;
+            prev = gradient[j];
+        }
+
+        while (!next[1]) {
+            if (k === gradient.length - 1) kd *= -1;
+            k += kd;
+            next = gradient[k];
+        }
+
+        const t = (next[0] === prev[0]) ? 0 : (x[0] - prev[0]) / (next[0] - prev[0]);
+
+        const interpolated = prev[1].map((el, i) =>
+            el + (next[1][i] - el) * t
+        );
+        if (which === 1) interpolated[3] = 1;
+        else interpolated[3] = ALPHA;
+        return interpolated;
+    }
+
+
+    var tile = 'data_par_trajet-dgqfqo'
+    var url = 'mapbox://tonyh70.9n1edek3'
+    mapboxgl.accessToken = 'pk.eyJ1IjoidG9ueWg3MCIsImEiOiJCd2NPU2pVIn0.IvZwW3UjZRpcobZK1-QfdQ';
+    //Init de la map 
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 1
+    });
+
+    // set the bounds of the map
+    var bounds = [
+        [-2.362835741, 41.3920234558],
+        [5.9610412121, 46.1122782548]
+    ];
+    /*[[[-0.762835741,42.3920234558],[4.9610412121,42.3920234558],[4.9610412121,46.1122782548],[-0.762835741,46.1122782548],[-0.762835741,42.3920234558]]]*/
+    map.setMaxBounds(bounds);
+
+    // initialize the map canvas to interact with later
+    var canvas = map.getCanvasContainer();
+    //Initialisation des variables globales
+    var count = 0;
+    var trajet = [];
+    var lineTrajet = [];
+    var start = [];
+    var end = [];
+
+
+    map.on('load', function() {
+
+                /*        map.addLayer({
+                            "id": "blabla",
+                            "type": "circle",
+                                "source": {
+                                  "type": 'geojson',
+                                  "data": './donnees_trajet/data_par_trajet.geojson' // replace this with the url of your own geojson
+                                },
+                            paint: {
+                                'circle-color': 'black',
+                                'circle-opacity': 0.3
+                            },
+                        });*/
+                var latitude = 42.89347078;
+                var longitude = 1.952743897;
+                var coordonneesPoint = [longitude, latitude];
+
+                map.addSource('line', {
+                    'type': 'geojson',
+                    'lineMetrics': true,
+                    'data': './donnees_trajet/map.geojson'
+                });
+
+                map.addLayer({
+                        'type': 'line',
+                        'source': 'line',
+                        'id': 'line',
+                        'paint': {
+                            /*'line-width': 0,*/
+                            /*'line-gradient': makeGradient(0)*/
+                            //data-driven style for line offset
+/*                        "line-width": {
+                                        "type": "exponential",
+                                        "base": 2,
+                                        "stops": [
+                                            [0, 10 * Math.pow(2, (0 - 20))],
+                                            [100, 10 * Math.pow(2, (24 - 20))]
+                                        ]
+                                    },*/
+                          },
+                            'layout': {
+                                'line-cap': 'round',
+                                'line-join': 'round'
+                            }
+                        });
+
+
+                    let interval;
+
+                    setTimeout(() => {
+                        if ($('#switch-orange').is(":checked")) {
+                            console.log("Travail");
+                            runGradient();
+                        } else {
+                            console.log("Domicile");
+                            runGradientInverse()
+                        }
+                    }, 10);
+                })
+
+            $("#switch-orange").change(function() {
+                if ($('#switch-orange').is(":checked")) {
+                    runGradient();
+                } else {
+                    console.log("Domicile");
+                    runGradientInverse()
+                }
+            })
+
+            let interval;
+
+            function runGradient() {
+                var sens = 'work';
+                if (interval) clearInterval(interval);
+                let i = 0;
+                map.setPaintProperty('line', 'line-gradient', makeGradient(0));
+                interval = setInterval(() => {
+                    i += 0.003;
+                    if (i >= 1) {
+                        map.setPaintProperty('line', 'line-gradient', makeGradient(1));
+                        map.setPaintProperty('line', 'line-width', 20);
+                        /*clearInterval(interval);*/
+                        i = 0
+                    } else {
+                        map.setPaintProperty('line', 'line-gradient', makeGradient(i, sens));
+                        map.setPaintProperty('line', 'line-width', 3);
+                    }
+                }, 20);
+            }
+
+            function runGradientInverse() {
+                var sens = 'home';
+                if (interval) clearInterval(interval);
+                let i = 1;
+                map.setPaintProperty('line', 'line-gradient', makeGradient(0));
+                interval = setInterval(() => {
+                    i -= 0.003;
+                    if (i <= 0) {
+                        map.setPaintProperty('line', 'line-gradient', makeGradient(1));
+                        /*map.setPaintProperty('line', 'line-width', 20);*/
+                        /*clearInterval(interval);*/
+                        i = 1
+                    } else {
+                        map.setPaintProperty('line', 'line-gradient', makeGradient(i, sens));
+                        map.setPaintProperty('line', 'line-width', 3);
+                    }
+                }, 20);
+            }
+
+
+            d3.select('#sliderTrajet').on('change', function(a, f) {
+                //Déclaration de l'array vide
+                var polygonsFiltres = [];
+
+                //On récupère la value du slider 
+                var median2 = parseInt($('#sliderTrajet').val());
+                if (median2 < 100) {
+                    document.getElementById('nombreActif').innerText = ' 100';
+                } else {
+                    document.getElementById('nombreActif').innerText = median2.toLocaleString();
+                }
+
+
+                var filterMedian = ['<=', ['number', ['get', 'qtite_extra']], median2];
+                /*       var filterMobility = ['<=', ['number', ['get', '2014_extra_communes']], 0];
+                       map.setFilter('blabla', ['all', filterMedian, filterMobility])
+                       var filterMedian = ['<=', ['number', ['get', 'nombreActif_med']], median2];*/
+                map.setFilter('line', ['all', filterMedian])
+
+                //Query sur la couche pour récupérer les propriétés des polygons filtrés
+                var results = map.querySourceFeatures('line', {
+                    filter: ['<=', ['number', ['get', 'qtite_extra']], median2],
+                });
+                //On boucle pour pusher les données dans un array 
+                for (var i = 0; i < results.length; i++) {
+                    polygonsFiltres.push(results[i]);
+                }
+                var resArr = [];
+                polygonsFiltres.filter(function(item) {
+                    var i = resArr.findIndex(x => (x.properties.commune == item.properties.commune));
+                    if (i <= -1) {
+                        resArr.push(item);
+                    }
+                    return null;
+                });
+                var meanPop = d3.max(resArr, function(d) { return +d.properties.qtite_extra; });
+                console.log(meanPop);
+
+            })
+    </script>
+</body>
+
+</html>

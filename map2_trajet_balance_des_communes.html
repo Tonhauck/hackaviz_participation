@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+        body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+.listing-group {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+font-weight: 600;
+position: absolute;
+top: 10px;
+right: 10px;
+z-index: 1;
+border-radius: 3px;
+max-width: 20%;
+color: #fff;
+}
+ 
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+html, body {
+  background: #ecf0f1;
+  color: #444;
+  font-family: Tahoma, Geneva, sans-serif;
+  font-size: 16px;
+  padding: 10px;
+}
+.button-switch {
+  font-size: 1.5em;
+  height: 1.875em;
+  margin-bottom: 0.625em;
+  position: relative;
+  width: 7em;
+}
+.button-switch .lbl-off, .button-switch .lbl-on {
+  cursor: pointer;
+  display: block;
+  font-size: 0.9em;
+  font-weight: bold;
+  line-height: 1em;
+  position: absolute;
+  top: 0.5em;
+  transition: opacity 0.25s ease-out 0.1s;
+  text-transform: uppercase;
+}
+.button-switch .lbl-off {
+  right: 0.4375em;
+}
+.button-switch .lbl-on {
+  color: #fefefe;
+  opacity: 0;
+  left: 0.4375em;
+}
+.button-switch .switch {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 0;
+  font-size: 1em;
+  left: 0;
+  line-height: 0;
+  outline: none;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+.button-switch .switch:before, .button-switch .switch:after {
+  content: '';
+  font-size: 1em;
+  position: absolute;
+}
+.button-switch .switch:before {
+  border-radius: 1.25em;
+  background: #3498db;
+  height: 1.875em;
+  left: -0.25em;
+  top: -0.1875em;
+  transition: background-color 0.25s ease-out 0.1s;
+  width: 7em;
+}
+.button-switch .switch:after {
+  box-shadow: 0 0.0625em 0.375em 0 #666;
+  border-radius: 50%;
+  background: #fefefe;
+  height: 1.5em;
+  transform: translate(0, 0);
+  transition: transform 0.25s ease-out 0.1s;
+  width: 1.5em;
+}
+.button-switch .switch:checked:after {
+  transform: translate(5em, 0);
+}
+.button-switch .switch:checked ~ .lbl-off {
+  opacity: 0;
+}
+.button-switch .switch:checked ~ .lbl-on {
+  opacity: 1;
+}
+.button-switch .switch#switch-orange:checked:before {
+  background: #e67e22;
+}
+
+
+
+
+</style>
+
+<body>
+    <div id='map'></div>
+    <nav id='listing-group' class='listing-group'>
+        <div id="silder" class='session'>
+            <h2>Affichage des trajets dont le nombre de travailleurs actifs se déplaçant en voiture est inférieur à <label id='nombreActif'>190</label> déplacements</h2>
+            <input id='sliderTrajet' name="sliderTrajet" style="width:100%" class='slider' type='range' min='99' max='190' step='1' value='190' />
+        </div>
+    </nav>
+    <script>
+    const ALPHA = 0.01;
+
+    const rainbow = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    const rainbowInverse = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    function makeGradient(z, sens) {
+        if (sens == 'work') {
+            let gradient = rainbowInverse.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        } else {
+            let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        }
+        let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        gradient = gradient.concat([z, z - 0.02, z + 0.02].map(p => [p, undefined]));
+        gradient.sort((a, b) => a[0] - b[0]);
+
+        let which = 0;
+        for (let i = 0; i < gradient.length; i++) {
+            if (gradient[i][1]) continue;
+            gradient[i][1] = tween(i, which, gradient);
+            which++;
+            if (which === 3) break;
+        }
+
+        const deduped = gradient.reduce((a, stop, i) => {
+            if (i && a[a.length - 1][0] === stop[0]) {
+                if (stop[1][3] === 1) {
+                    a[a.length - 1][1][3] = 1;
+                }
+            } else {
+                if (stop[0] <= 1 || a[a.length - 1][1][3] !== 1)
+                    a.push(stop);
+            }
+
+            return a;
+        }, []).map(stop => [stop[0], `rgba(${stop[1].join(',')})`]);
+
+        return Array.prototype.concat.apply([
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+        ], deduped);
+    }
+
+    function tween(i, which, gradient) {
+        const x = gradient[i];
+        let prev = x,
+            next = x,
+            j = i,
+            jd = -1
+        k = i,
+            kd = 1;
+        while (!prev[1]) {
+            if (j === 0) jd *= -1;
+            j += jd;
+            prev = gradient[j];
+        }
+
+        while (!next[1]) {
+            if (k === gradient.length - 1) kd *= -1;
+            k += kd;
+            next = gradient[k];
+        }
+
+        const t = (next[0] === prev[0]) ? 0 : (x[0] - prev[0]) / (next[0] - prev[0]);
+
+        const interpolated = prev[1].map((el, i) =>
+            el + (next[1][i] - el) * t
+        );
+        if (which === 1) interpolated[3] = 1;
+        else interpolated[3] = ALPHA;
+        return interpolated;
+    }
+
+
+    var tile = 'data_par_trajet-dgqfqo'
+    var url = 'mapbox://tonyh70.9n1edek3'
+    mapboxgl.accessToken = 'pk.eyJ1IjoidG9ueWg3MCIsImEiOiJCd2NPU2pVIn0.IvZwW3UjZRpcobZK1-QfdQ';
+    //Init de la map 
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 1
+    });
+
+    // set the bounds of the map
+    var bounds = [
+        [-2.362835741, 41.3920234558],
+        [5.9610412121, 46.1122782548]
+    ];
+    /*[[[-0.762835741,42.3920234558],[4.9610412121,42.3920234558],[4.9610412121,46.1122782548],[-0.762835741,46.1122782548],[-0.762835741,42.3920234558]]]*/
+    map.setMaxBounds(bounds);
+
+    // initialize the map canvas to interact with later
+    var canvas = map.getCanvasContainer();
+    //Initialisation des variables globales
+    var count = 0;
+    var trajet = [];
+    var lineTrajet = [];
+    var start = [];
+    var end = [];
+
+
+    map.on('load', function() {
+        map.addLayer({
+            'id': 'balance',
+            'type': 'circle',
+            "source": {
+                "type": 'geojson',
+                "data": 'données_commune/par_communev4.geojson' // replace this with the url of your own geojson
+            },
+/*            'filter': ['all', [">", "Balance", '10000000']],*/
+            'paint': {
+                "circle-color": {
+                    "property": "Balance",
+                    "stops": [
+ 
+                        [0, "red"],
+                        [1, "green"],
+                        [100000, "green"]
+                    ],
+                },
+                'circle-opacity': 0.7,
+                'circle-radius': {
+                    property: 'Balance',
+                    stops: [
+                        [{ zoom: 8, value: -7000 }, 10],
+                        [{ zoom: 8, value: -2151 }, 5],
+                        [{ zoom: 8, value: 0 }, 3],
+                        [{ zoom: 8, value: 2151 }, 5],
+                        [{ zoom: 8, value: 9077 }, 12],
+                        [{ zoom: 8, value: 43660 }, 20],
+                        [{ zoom: 8, value: 87000 }, 30],                     
+                    ]
+                }
+            }
+        });
+                //Query sur la couche pour récupérer les propriétés des polygons filtrés
+        var filterMedian = ['<', ['number', ['get', 'Balance']], 10000000];
+        /*       var filterMobility = ['<=', ['number', ['get', '2014_extra_communes']], 0];
+               map.setFilter('blabla', ['all', filterMedian, filterMobility])
+               var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median2];*/
+        map.setFilter('balance', ['all', filterMedian])
+    });
+
+
+    // Create a popup, but don't add it to the map yet.
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    map.on('mouseenter', 'balance', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+
+        if (e.features[0].properties.total_personne_entrante>e.features[0].properties.total_personne_partante) {
+        var color = 'green';
+      }
+      else {
+          var color = 'red';      
+      }
+      if (e.features[0].properties.total_personne_entrante>e.features[0].properties.total_personne_partante) {
+        var sign = '+';
+      }
+      else {
+          var sign = '';      
+      }
+        var coordinates = e.features[0].geometry.coordinates.slice();
+        var description = "Commune de " + e.features[0].properties.commune +'<br>' + 
+                          "<span style='font-weight:bold; color:"+color+"'> Balance des déplacements entrants et sortants : " + sign+(e.features[0].properties.Balance).toLocaleString()  + "</span><br>" +
+                          "Nombre de déplacements entrants sur la commune"  +"<span> " + '+'+(e.features[0].properties.total_personne_entrante).toLocaleString()  +"</span>" +  "<br>" +
+                          "Nombre de déplacements sortants sur la commune" +"<span> " + '-'+(e.features[0].properties.total_personne_partante).toLocaleString()  +"</span>";
+
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+    });
+
+    map.on('mouseleave', 'balance', function() {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+    });
+    </script>
+</body>
+
+</html>

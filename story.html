@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='fonts.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.14/c3.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+margin: 0;
+padding: 0;
+}
+#scrolly {
+position: relative;
+background-color: #f3f3f3;
+padding: 1rem;
+}
+/* article {
+position: relative;
+padding: 0;
+max-width: 20rem;
+margin: 0 auto;
+}
+figure {
+position: -webkit-sticky;
+position: sticky;
+left: 0;
+width: 100%;
+margin: 0;
+-webkit-transform: translate3d(0, 0, 0);
+-moz-transform: translate3d(0, 0, 0);
+transform: translate3d(0, 0, 0);
+background-color: #8a8a8a;
+}
+figure p {
+text-align: center;
+padding: 1rem;
+position: absolute;
+top: 50%;
+left: 50%;
+-moz-transform: translate(-50%, -50%);
+-webkit-transform: translate(-50%, -50%);
+transform: translate(-50%, -50%);
+font-size: 8rem;
+font-weight: 900;
+color: #fff;
+}
+*/
+.hello {
+background-image: url("img/car_back.jpg");
+background-color: #cccccc;
+/* Add the blur effect */
+filter: blur(6px);
+-webkit-filter: blur(6px);
+background-position: center;
+/* Center the image */
+width: 100%;
+height: 100vh;
+background-size: cover;
+}
+.bandeau {
+background: rgba(255, 255, 255, 0.55);
+position: absolute;
+width: 100%;
+height: auto;
+padding-top: 3%;
+padding-bottom: 3%;
+}
+
+.bandeaufleche {
+color:white;
+position: absolute;
+width: 100%;
+height: auto;
+padding-top: 3%;
+padding-bottom: 3%;
+}
+.bandeauSub {
+background: rgba(255, 255, 255, 0.55);
+width: 100%;
+height: auto;
+padding-top: 7%;
+padding-bottom: 7%;
+}
+h1,
+.h1 {
+font-family: "louisBold", sans-serif;
+font-weight: 400;
+font-size: 3.5em;
+margin: 0;
+padding: 0;
+color: rgba(71, 63, 61, 1);
+/* color: rgba(205,31,44,1); */
+/* line-height: 1em;*/
+text-align: center;
+}
+h2 {
+font-weight: 200;
+font-size: 1.6em;
+color: rgba(71, 63, 61, 0.8);
+line-height: 1.2em;
+margin: 0;
+padding: 0;
+margin-top: 10px;
+text-align: center;
+}
+#map {
+width: auto;
+height: 100vh;
+}
+#map2 {
+width: auto;
+height: 100vh;
+}
+.listing-group {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+font-weight: 600;
+position: absolute;
+top: 10px;
+right: 10px;
+z-index: 1;
+border-radius: 3px;
+max-width: 20%;
+color: #fff;
+}
+.listing-groupleft {
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+font-weight: 600;
+position: absolute;
+top: 10px;
+left: 15px;
+z-index: 1;
+border-radius: 3px;
+max-width: 20%;
+color: #fff;
+}
+*,
+*:before,
+*:after {
+box-sizing: border-box;
+}
+.button-switch {
+font-size: 1.5em;
+height: 1.875em;
+margin-bottom: 0.625em;
+position: relative;
+width: 7em;
+}
+.button-switch .lbl-off,
+.button-switch .lbl-on {
+cursor: pointer;
+display: block;
+font-size: 0.7em;
+
+line-height: 1em;
+position: absolute;
+top: 0.5em;
+transition: opacity 0.25s ease-out 0.1s;
+text-transform: uppercase;
+}
+.button-switch .lbl-off {
+right: 0.9575em;
+}
+.button-switch .lbl-on {
+color: #fefefe;
+opacity: 0;
+left: 0.4375em;
+}
+.button-switch .switch {
+-webkit-appearance: none;
+-moz-appearance: none;
+appearance: none;
+height: 0;
+font-size: 1em;
+left: 0;
+line-height: 0;
+outline: none;
+position: absolute;
+top: 0;
+width: 0;
+}
+.button-switch .switch:before,
+.button-switch .switch:after {
+content: '';
+font-size: 1em;
+position: absolute;
+}
+.button-switch .switch:before {
+border-radius: 1.25em;
+background: #3498db;
+height: 1.875em;
+left: -0.25em;
+top: -0.1875em;
+transition: background-color 0.25s ease-out 0.1s;
+width: 7em;
+}
+.button-switch .switch:after {
+box-shadow: 0 0.0625em 0.375em 0 #666;
+border-radius: 50%;
+background: #fefefe;
+height: 1.5em;
+transform: translate(0, 0);
+transition: transform 0.25s ease-out 0.1s;
+width: 1.5em;
+}
+.button-switch .switch:checked:after {
+transform: translate(5em, 0);
+}
+.button-switch .switch:checked~.lbl-off {
+opacity: 0;
+}
+.button-switch .switch:checked~.lbl-on {
+opacity: 1;
+}
+.button-switch .switch#switch-orange:checked:before {
+background: #e67e22;
+}
+.inactive {
+width: 0px;
+height: auto;
+}
+.active {
+width: auto;
+height: 100vh;
+}
+.accroche {
+font-family: Source Sans Pro !important;
+font-weight: 400 !important;
+color: rgba(71, 63, 61, 0.7) !important;
+/* max-width: 900px !important;*/
+text-align: center !important;
+margin: 2em !important;
+font-size: 1.2em !important;
+}
+
+.accroche2 {
+font-family: Source Sans Pro !important;
+font-weight: 400 !important;
+color: rgba(71, 63, 61, 0.7) !important;
+/* max-width: 900px !important;*/
+text-align: justify; !important;
+margin: 2em !important;
+font-size: 1.2em !important;
+}
+#scroll3 {
+position: relative;
+display: -webkit-box;
+display: -ms-flexbox;
+display: flex;
+padding: 1rem;
+}
+#scroll3 > * {
+-webkit-box-flex: 1;
+-ms-flex: 1;
+flex: 1;
+}
+article {
+position: relative !important;
+padding: 0 1rem !important;
+max-width: 20rem !important;
+}
+
+
+figure {
+position: -webkit-sticky !important;
+position: sticky !important;
+width: 100% !important;
+margin: 0 !important;
+-webkit-transform: translate3d(0, 0, 0) !important;
+-moz-transform: translate3d(0, 0, 0) !important;
+transform: translate3d(0, 0, 0) !important;
+/* background-color: #8a8a8a !important;*/
+}
+figure p {
+text-align: center !important;
+padding: 1rem !important;
+position: absolute !important;
+top: 50% !important;
+left: 50% !important;
+-moz-transform: translate(-50%, -50%) !important;
+-webkit-transform: translate(-50%, -50%) !important;
+transform: translate(-50%, -50%) !important;
+font-size: 8rem !important;
+font-weight: 900 !important;
+color: #fff !important;
+}
+#scrolly {
+position: relative;
+display: -webkit-box;
+display: -ms-flexbox;
+display: flex;
+background-color: #f3f3f3;
+padding: 1rem;
+}
+#scrolly > * {
+-webkit-box-flex: 1;
+-ms-flex: 1;
+flex: 1;
+}
+article {
+position: relative;
+padding: 0 1rem;
+max-width: 20rem;
+}
+figure {
+position: -webkit-sticky;
+position: sticky;
+width: 100%;
+margin: 0;
+-webkit-transform: translate3d(0, 0, 0);
+-moz-transform: translate3d(0, 0, 0);
+transform: translate3d(0, 0, 0);
+/* background-color: #8a8a8a;*/
+}
+figure > .chart {
+/* text-align: center;*/
+padding: 1rem;
+position: absolute;
+top: 50%;
+left: 50%;
+-moz-transform: translate(-50%, -50%);
+-webkit-transform: translate(-50%, -50%);
+transform: translate(-50%, -50%);
+/*font-size: 8rem;*/
+font-weight: 400;
+color: rgba(71, 63, 61, 1);
+width: 100%;
+height: 100%;
+}
+.steppy {
+margin: 0 auto 2rem auto;
+/* background-color: #3b3b3b;*/
+/* color: #fff;*/
+}
+.steppy:last-child {
+margin-bottom: 0;
+}
+.steppy.is-active {
+background-color: goldenrod;
+color: #3b3b3b;
+}
+.steppy p {
+text-align: center;
+padding: 1rem;
+color:black;
+background-color: rgba(0, 0, 0, 0.0);
+/*font-size: 1.5rem;*/
+}
+.chart {
+position: absolute;
+right: 1rem;
+top: 50%;
+-moz-transform: translateY(-50%);
+-webkit-transform: translateY(-50%);
+transform: translateY(-50%);
+}
+figure.is-fixed {
+position: fixed;
+}
+figure.is-bottom {
+bottom: 0;
+top: auto;
+}
+#map3 {
+width: 100%;
+height: 80%;
+}
+.fit-picture {
+width: 35%;
+height: auto;
+margin: 2%;
+}
+.fiche_profil {
+display:table-cell;
+vertical-align:middle;}
+.vertical_align {
+flex-wrap:wrap;
+align-items: center;
+align-content:center;
+justify-content: center;
+margin-top: 2%;
+}
+/*Ternary style*/
+a {
+font-family: sans-serif;
+color: #DB7365;
+padding: 0.3rem;
+}
+a:hover {
+background-color: #DB7365;
+color: #fff1e0;
+}
+body {
+background: #fff;
+}
+line.tick {
+stroke-width: 0.5;
+stroke-opacity: 0.5
+}
+line.minor-tick {
+stroke-width: 1;
+stroke-opacity: 0;
+}
+.a-axis,
+.b-axis,
+.c-axis {
+stroke: #484848;
+}
+circle {
+/* fill: #00A699;*/
+fill-opacity: 0.5;
+stroke: none;
+}
+.axis-title {
+font-size: 1rem;
+}
+.tick-text {
+font-size: 1rem;
+}
+.legend {
+    font-size: 0.8em;}
+
+      .legend {
+    font-size: 12px;
+    font-family: sans-serif;
+  }
+
+  .legend path,
+  .legend line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    opacity: 1;
+  }
+
+  .circle-legend line {
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .circle-legend circle {
+    stroke: #ccc;
+    stroke-dasharray: 4, 2;
+    fill: none;
+  }
+
+      .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+
+  #chart {
+        background: #fff;
+        font-weight: 700;
+    }
+
+    .title {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-top: 6px;
+        margin-bottom: 6px;
+    }
+
+    text {
+        pointer-events: none;
+    }
+
+    .grandparent text {
+        font-weight: bold;
+    }
+
+    rect {
+        fill: none;
+        stroke: #fff;
+    }
+
+    rect.parent,
+    .grandparent rect {
+        stroke-width: 2px;
+    }
+
+    rect.parent {
+        pointer-events: none;
+    }
+
+    .grandparent rect {
+        fill: #CBD9D6;
+    }
+
+    .grandparent:hover rect {
+        fill: #A8E6CF;
+    }
+
+    .children rect.parent,
+    .grandparent rect {
+        cursor: pointer;
+    }
+
+    .children rect.parent {
+        fill: #bbb;
+        fill-opacity: .9;
+    }
+
+    .children:hover rect.child {
+        fill: #bbb;
+    }
+
+    .cleDeLecture {
+        font-style: italic;
+        font-size: 0.8em;
+    }
+
+.custom-counter {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.custom-counter li {
+  counter-increment: step-counter;
+  margin-bottom: 10px;
+}
+
+.custom-counter li::before {
+  content: counter(step-counter);
+  margin-right: 5px;
+  font-size: 80%;
+  background-color: rgb(0,200,200);
+  color: white;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.rect {
+    background-color: rgba(0,0,0,0.3);
+    stroke: green;
+}
+
+.rect2 {
+    background-color: rgba(0,0,0,0.3);
+    stroke: red;
+}
+
+ </style>
+</head>
+
+<body>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-115550816-1');
+</script>
+<!-- End Analytics -->
+    <main>
+        <div class="hello"></div>
+        <div class="bandeau">
+            <h1 class="h1" align="center">Les déplacements domicile-travail en Occitanie</h1>
+            <h2 class="h2" align="center">9 graphiques pour comprendre les flux professionnels dans la Région</h2>
+            <br>
+        </div>
+        <div class="bandeaufleche" align="center">
+            <h4 style="margin-bottom: 4px"> Sens de l'histoire racontée </h4>
+            <img src="img/fleche.png" align="center" height="42" width="42">
+            <h6 style="font-style:italic; margin-top: 4px"> Scrollez, interagissez ! </h6>
+        </div>
+        <div class="">
+            <div class="bandeauSub">
+                <h1 class="h1" align="center">De quoi parle-t-on ? </h1>
+                <hr>
+                <p class="accroche">Les flux de mobilité des « déplacements domicile-travail » fournissent, pour l'ensemble des communes (France métropolitaine et DOM), les effectifs correspondant aux croisements du lieu de résidence avec le lieu de travail. <br> <div class="cleDeLecture" align="center" > Le temps de chargement peut être un peu plus long que prévu en raison du nombre important de données à afficher sur la carte ci-dessous</div></p>
+
+
+            </div>
+        </div>
+        <section id='scroll'>
+            <div class='scroll__graphic sticky' id="map">
+                <nav id='listing-group' class='listing-group'>
+                    <div class="button-switch">
+                        <input type="checkbox" id="switch-orange" class="switch" checked />
+                        <label for="switch-orange" class="lbl-off">Dom <= Tra</label> <label for="switch-orange" class="lbl-on">Dom => Tra</label>
+                    </div>
+                    <div id="silder" class='session' style="background-color: rgba(0,0,0,0.2); padding: 3px">
+                        <h6>Affichage des trajets dont le nombre de travailleurs actifs se déplaçant en voiture est inférieur à <label id='nombreActif'>190</label> déplacements <br><i style="font-size: 0.8em">Source : données par trajet</i></h6>
+                        <input id='sliderTrajet' name="sliderTrajet" style="width:100%" class='slider' type='range' min='99' max='190' step='1' value='190' />
+                    </div>
+                </nav>
+            </div>
+            <div class='scroll__text'>
+                <div class='step' data-step='Each1'>
+                </div>
+                <div class='step' data-step='Each2'>
+                </div>
+                <div class='step' data-step='Intro'>
+                    <p>En Occitanie, l'étude de ces flux nous permet de montrer les points chauds de l'économie de la région.</p>
+                </div>
+                <div class='step' data-step='Intro2'>
+                    <p>Cette carte interactive nous permet de visualiser l'ensemble des déplacements domicile-travail en Occitanie en 2014. Les tracés de ces déplacements gagnent véritablement en intensité autour de deux espaces distincts.</p>
+                </div>
+                <div class='step' data-step='Toulouse'>
+                    <p>1. Toulouse, sa couronne périphérique ainsi que les villes satellites gravitant autour de la capitale occitane.<br>
+                        L'influence de la ville rose est telle que cette dernière capte plus de 22% de l'ensemble des déplacements en direction du lieu de travail (environ 130 000 déplacements journaliers), en légère hausse par rapport à 2009.</p>
+                </div>
+                <div class='step' data-step='littoral'>
+                    <p>2. Le littoral maritime et son chapelet de villes s'étendant de Perpignan jusqu'à Avignon. </p>
+                </div>
+                <div class='step' data-step='Passes'>
+                    <p>L'Occitanie est donc un territoire dont le dynamisme se concentre essentiellement autour de ces deux grands axes.</p>
+                </div>
+            </div>
+        </section>
+        <div class="">
+            <div class="bandeauSub">
+                <h1 class="h1" align="center"> Les mobilités professionnelles de la Région organisées selon un modèle centre-périphérie </h1>
+                <hr>
+                <p class="accroche">Après avoir mis en évidence l'existence de deux espaces de forte densité de déplacements professionnels, nous allons nous attarder sur les points de départ et d'arrivée des différents trajets dans le but de mettre en exergue des aires de polarisation des flux.</p>
+            </div>
+        </div>
+        <section id='scroll2'>
+            <div class='scroll__graphic sticky' id="map2">
+                <nav id='listing-group' class='listing-groupleft'>
+                    <input type="checkbox" name="Balance" id="Balance"> Balance
+                    <input type="checkbox" name="deplacements" id="deplacements"> Déplacements
+                </nav>
+            </div>
+            <div class='scroll__text right '>
+                <div class='step' data-step='Each1'>
+                </div>
+                <div class='step' data-step='Each1'>
+                </div>
+                <div class='step' data-step='intro2'>
+                    <p>Intéressons-nous désormais aux communes. Les flux de déplacements professionnels s'organisent selon un modèle centre-périphérie relativement classique.</p>
+                </div>
+                <div class='step' data-step='bezier'>
+                    <p>Illustrons ce propos avec un petit exemple : Béziers. Béziers est le cas typique d'une commune-centre où gravite tout autour d'elle une myriade de "cités-dortoirs" (Lignan-sur-Orb, Maraussan, Lespignan... Pour ne citer que quelques exemples). On observe 15 521 déplacements journaliers en direction de Béziers contre un peu plus de 2600 départs, selon les chiffres de 2014. </p>
+                </div>
+                <div class='step' data-step='toulouseCity'>
+                    <p>Le cas le plus remarquable et révélateur de ce modèle centre-périphérie est sans conteste Toulouse avec un différentiel entrée-sortie de +86 408 déplacements en 2014 ! </p>
+                </div>
+                <div class='step' data-step='occitanieDyna'>
+                    <p>Ainsi, de grands mouvements de personnes animent au quotidien la Région Occitanie, formant de véritables aires de polarisation des déplacements. Néanmoins, lorsque vous regardez la Région dans son ensemble, ne remarquez-vous rien de plus ?</p>
+                </div>
+            </div>
+        </section>
+        <div class="">
+            <div class="bandeauSub">
+                <h1 class="h1" align="center"> Les oubliés de la mobilité </h1>
+                <hr>
+                <p class="accroche">En marge du dynamisme des aires de polarisation structurant le territoire occitan, on trouve de petits bourgs, des villages de campagne ou des hameaux, ne participant pas ou que très peu aux mobilités de la Région. </p>
+            </div>
+        </div>
+        <section id='scroll3'>
+            <article class='scroll__text'>
+                <div class='step steppy' data-step='1'>
+                    <p>Sur plus de 71 % du territoire, on dénombre moins de 100 déplacements journaliers. La carte interactive nous indique où se situent les communes qui connaissent une relative immobilité. A gauche de la carte, nous observons plusieurs indicateurs qui nous permettent d'établir le profil moyen pour l'ensemble des communes filtrées. </p>
+                </div>
+                <div class='step steppy' data-step='reloadFilter'>
+                    <p>En partant du postulat que ce sont les personnes disposant d'un faible capital économique qui sont les plus touchées par l'immobilité, il serait intéressant de visualiser la variation des indicateurs ci-contre en ajustant la sélection des communes à partir du revenu médian.</p>
+                </div>
+                <div class='step steppy' data-step='jouons'>
+                    <p>Voyons... Si on applique un filtre de sélection des communes dont le revenu médian annuel est inférieur à 12 000 €, que constatons-nous ?!! </p>
+                </div>
+                <div class='step steppy' data-step='jouez'>
+                    <p>A vous de jouer ! Essayez de faire varier le revenu annuel médian, et découvrez le résultat !</p>
+                </div>
+            </article>
+            <figure class='scroll__graphic'>
+                <div class="chart">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="row justify-content-center">
+                                <h2 class="fiche_profil text-center" align="center">Profil des <span id="numCom" style="font-weight: bold;"> 3521 </span> communes filtrées</h2>
+                            </div>
+                            <div class="row vertical_align">
+                                <div class="col-sm-3">
+                                    <img class="fit-picture" src="img/three-users.png" alt="population moyenne" />
+                                </div>
+                                <div class="col-sm-9 fiche_profil justify-content-center">
+                                    <span class="" id="popMoyenne">19.6 % de la population totale de la Région (soit un total de 80 851 emplois)</span>
+                                </div>
+                            </div>
+                            <div class="row vertical_align">
+                                <div class="col-sm-3">
+                                    <img class="fit-picture" src="img/job.png" alt="population moyenne" />
+                                </div>
+                                <div class="col-sm-9 fiche_profil ">
+                                    <span class="" id="emploi">12 % des emplois totaux de la Région (soit un total de 1 127 214 personnes)</span>
+                                </div>
+                            </div>
+                            <div class="row vertical_align">
+                                <div class="col-sm-3">
+                                    <img class="fit-picture" src="img/euro-currency-symbol.png" alt="€" />
+                                </div>
+                                <div class="col-sm-9 fiche_profil ">
+                                    <span class="" id="revenuMoyen"> Un revenu moyen de 14 425 € </span>
+                                </div>
+                            </div>
+                            <div class="row vertical_align ">
+                                <div class="col-sm-3">
+                                    <img class="fit-picture" src="img/mount.png" alt="€" />
+                                </div>
+                                <div class="col-sm-9 fiche_profil ">
+                                    <span class="" id="altitude"> Altitude moyenne des communes : 459 m </span>
+                                </div>
+                            </div>
+                            <div class="row vertical_align">
+                                <div class="col-sm-3">
+                                    <img class="fit-picture" src="img/car.png" alt="sans voiture" />
+                                </div>
+                                <div class="col-sm-9 fiche_profil ">
+                                    <span class="" id="surface">Une absence ou un flux très réduit de déplacements concernant 71 % de la surface totale d'Occitanie</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row justify-content-center">
+                                <h2 class="fiche_profil text-center" align="center">Localisation des communes</h2>
+                            </div>
+                            <div class="row" id='map3'></div>
+                            <div class="row ">
+                                <div id="slider3" class='session'>
+                                    <h4>Affichage des communes d'Occitanie ayant un revenu médian inférieur à <label id='revenu' style="font-weight: bold;">12 000 €</label> et ne comptabilisant pas ou peu de déplacements sur leur sol</h4>
+                                    <input id='slider4' name="slider4" style="width:100%" class='slider' type='range' min='0' max='42000' step='1' value='12000' />
+                                </div>
+                                <div id="silder" class='session' style="background-color: white; height: 25em"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: -10%">
+                        <div class="col-sm-6 fiche_profil vertical_align">
+                            <div class="row vertical_align">
+                                <h4>Répartition des communes par départements<h4>
+                                        <div class="" id="piechart"></div>
+                                    </h4>
+                                    <div class="row vertical_align">
+                                        <div class="cleDeLecture" style="">Note : des aberrations au niveau des chiffres des indicateurs peuvent être visibles. Celles-ci sont le fait des petites communes ne disposant pas de données statistiquement solides. </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+            </figure>
+        </section>
+        <div class="bandeauSub">
+            <p class="accroche">L'influence de ces nombreuses communes est, certes, moindre en comparaison des grandes métropoles occitanes, mais elles ne doivent surtout pas être oubliées lorsque l'on observe les dynamiques de mobilité à l'oeuvre à l'échelle de la Région. </p>
+        </div>
+        <div class="bandeauSub">
+            <h1 class="h1" align="center"> Caractérisation des flux domicile-travail en Occitanie </h1>
+            <hr>
+            <p class="accroche">Nous avons vu précédemment que les déplacements professionnels en Occitanie s'organisaient autour d'aires de polarisation. Arrêtons-nous quelques instants sur les communes et les habitudes de déplacement des travailleurs. </p>
+        </div>
+        <section id='scroll4'>
+            <div id="graphiquePlot" class='scroll__graphic sticky '>
+                <h4 style="margin-left: 100px">Visualisation des communes selon trois critères de déplacement</h4>
+                <a class="legend" style="margin-left: 100px" id="tooltipLegend">Legende</a>
+                <div class="row" id="legendTooltip" style="margin-left: 100px;margin-right: 0px;">
+                    <div class="col-sm-3">
+                        <svg class="rect" width="40" height="10">
+                            <rect width="40" height="10" style="fill:green;" />
+                        </svg>
+                        <div class="legend">Balance des déplacements positive</div>
+                        <svg class="rect" width="40" height="10">
+                            <rect width="40" height="10" style="fill:red;" />
+                        </svg>
+                        <div class="legend">Balance des déplacements négative</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="circleLegend">
+                        </div>
+                    </div>
+                </div>
+                <div id="plot" class="vertical_align">
+                </div>
+            </div>
+            <div class='scroll__text right '>
+                <div class='step' data-step='Each1'>
+                </div>
+                <div class='step' data-step='Each1'>
+                </div>
+                <div class='step' data-step='intro2'>
+                    <p>Ce graphique triangulaire est très interessant car il nous permet de mieux comprendre comment s'organisent les déplacements entre les communes et à l'intérieur de ces dernières. Un petit exemple en guise de clé de lecture avec Toulouse. </p>
+                </div>
+                <div class='step' data-step='ToulouseGrandRond'>
+                    <p>Facilement reconnaissable, Toulouse est le plus gros rond vert se situant à gauche du triangle. Comme pour la carte des balances des déplacements, la taille du cercle correspond au nombre de déplacements concerné par Toulouse et la couleur indique si le flux de déplacements est positif ou négatif. De plus, avec ce graphique, nous savons quels sont les déplacements les plus fréquents pour chaque commune. </p>
+                </div>
+                <div class='step' data-step='patternPositif'>
+                    <p>Un pattern est clairement visible : d'un côté nous avons des communes polarisant à la fois une grande partie des déplacements professionnels et animées par de puissants flux internes, avec ou sans utilisation de la voiture.</p>
+                </div>
+                <div class='step' data-step='patternNegatif'>
+                    <p>De l'autre côté, nous avons des communes déficitaires en termes de déplacements journaliers, dont les actifs circulent majoritairement en voiture.</p>
+                </div>
+            </div>
+        </section>
+        <div class="bandeauSub">
+            <p class="accroche">Il est possible de creuser un peu plus la question et de s'intéresser, non seulement à l'aspect spatial, mais aussi aux déplacements sous un angle socio-économique. </p>
+        </div>
+        <!-- 
+        DOUBLE TERNARY  -->
+        <section id='scroll5'>
+            <div id="graphiquePlot2" class='scroll__graphic sticky '>
+                <div class="row" style="margin-right: 0px;">
+                    <div class="col-sm-6">
+                        <h4 style="margin-left: 100px">Visualisation des déplacements internes selon les CSP par communes</h4>
+                        <div id="plot2" style="margin-left: 100px" class="vertical_align">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h4 style="margin-left: 100px">Visualisation des déplacements externes selon les CSP par communes</h4>
+                        <div id="plot2bis" style="margin-left: 100px" class="vertical_align">
+                        </div>
+                    </div>
+                </div>
+                <div class='scroll__text right '>
+                </div>
+            </div>
+        </section>
+        <p class="accroche" style="text-align: justify !important;">Là-encore, deux patterns ressortent de nos deux graphiques : <br>
+         A gauche, nous retrouvons la part des déplacements internes pour nos trois regroupements de CSP. Nous remarquons que les cadres sont les principaux instigateurs des déplacements internes aux communes, et que Toulouse occupe une place à part dans la mesure où les 3 groupes sont présents de façon quasi-équitable dans ces mobilités quotidiennes. <br>
+            A droite, le constat est plus flou. En effet, la part des employés/ouvriers, cadres et professions intermédiaires est volatile suivant la localisation des communes. Nous ne disposons malheureusement pas de la donnée nécessaire nous permettant de connaître avec précision la part réelle de chaque groupe dans les déplacements extracommunaux, mais peut-être qu'une visualisation différente nous aiderait à y voir plus clair... </p>
+        <!-- 
+        TREE MAP  -->
+        <div class="bandeauSub">
+            <h1 class="h1" align="center"> Une visualisation des caractéristiques socio-économiques des communes et des dynamiques intercommunales </h1>
+            <hr>
+            <p class="accroche">Nous avons vu, dans un premier temps, la balance des déplacements pour chaque commune d'Occitanie. Dans un deuxième temps, nous nous sommes arrêtés sur la part des différentes CSP dans les déplacements externes aux communes. Nous allons désormais visualiser ces indicateurs qualitatifs et quantitatifs au sein d'une seule datavisualisation.</p>
+        </div>
+        <section id='scroll6'>
+            <div class='scroll__graphic sticky'>
+                <div class="col-sm-6">
+                    <h4 style="margin-left: 100px">Aires de polarisation et catégorisation des communes par CSP majoritaire dans les déplacements extracommunaux</h4>
+                </div><br>
+                <div id="chart" style="margin-left: 100px;"> </div>
+                <div class="col-sm-6">
+                    <div class="cleDeLecture" style="margin-left: 100px">Clé de lecture : On comptabilise 126 476 déplacements en direction de Toulouse. Parmi ces personnes, 5992 proviennent de la commune de Colomiers. A Colomiers, la catégorie des ouvriers est la plus représentée dans les déplacements professionnels extracommunaux. <br> Note : nous avons éliminé de l'analyse les communes ne disposant pas de données sur le nombre de personnes travaillant à l'extérieur de la commune de résidence (28 communes). C'est pour cette raison que les chiffres de cette visualisation diffèrent sensiblement des chiffres proposés plus haut. </div>
+                </div>
+            </div>
+            <div class='scroll__text right'>
+                <div class='step steppy' data-step='Each1'>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Ce type de visualisation des déplacements domicile-travail est intéressant à plus d'un titre. La première est que nous avons une vue sur les différentes aires de polarisation des flux. Ainsi, nous disposons d'un angle d'analyse complémentaire à la carte des balances des communes présentée plus haut.</p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Ensuite, lorsque l'on clique sur un grand ensemble de polarisation, nous avons la répartition des déplacements qui le composent.</p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Enfin, nous pouvons également savoir quelle est la CSP qui travaille majoritairement à l'extérieur de la commune de résidence. </p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Souvenez-vous de notre premier point... En Occitanie, les déplacements domicile-travail sont organisés selon deux grands espaces : l'aire de Toulouse et le littoral méditerranéen. </p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Cliquez maintenant sur les aires de polarisation composant ces deux espaces... </p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Les communes polarisatrices du littoral attirent des flux de personnes résidant dans des communes où une majorité d'employés et d'ouvriers. A l'inverse, Toulouse et sa couronne périphérique attirent un flux plus hétéroclite de personnes (cadres, professions intermédiaires et employés/ouvriers).</p>
+                </div>
+            </div>
+        </section>
+        <div class="bandeauSub">
+            <h1 class="h1" align="center"> Les effets négatifs de la mobilité </h1>
+            <hr>
+            <p class="accroche">La mobilité a des effets négatifs tant pour les personnes la pratiquant que pour l'environnement. Stress, émissions de CO2, consommation d'espaces... Les impacts des déplacements domicile-travail au quotidien sont nombreux. </p>
+        </div>
+        <section id='scroll8'>
+            <div class='scroll__graphic sticky'>
+                <div class="col-sm-6">
+                    <h4 style="margin-left: 100px">Temps d'accès et émissions de CO2 par personne pour chaque aire de polarisation </h4>
+                </div><br>
+                <div id="scatterPlot"></div>
+                <div class="col-sm-6">
+                    <div class="cleDeLecture" style="margin-left: 100px">Clé de lecture : chacune des 130 873 personnes se rendant à Toulouse émettra 3 434 g de CO2 au cours de son trajet qui durera en moyenne 25 minutes en voiture (s'il n'y a pas d'embouteillages, bien sûr !). </div>
+                </div>
+            </div>
+            <div class='scroll__text right'>
+                <div class='step steppy' data-step='Each1'>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>Ce dernier graphique sert avant tout à nous sensibiliser sur les externalités négatives de nos mobilités.</p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>En effet, dans un contexte de réchauffement climatique global, chaque geste compte. En Occitanie, chaque automobiliste émet en moyenne 2 kg de CO2 dans l'atmosphère en se rendant sur son lieu de travail. Le graphique ci-contre présente le détail de ce chiffre. </p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p>De plus, chaque trajet domicile-travail dure en moyenne 40 min (dans le meilleur des cas !!) </p>
+                </div>
+                <div class='step steppy' data-step=''>
+                    <p> Ces déplacements sont coûteux à la fois pour notre porte-feuille, notre temps libre, notre planète et notre santé. </p>
+                </div>
+            </div>
+        </section>
+        <div class="bandeauSub">
+        </div>
+        <div class="bandeauSub">
+            <h1 class="h1" align="center"> Que doit-on retenir ? </h1>
+            <hr>
+            <p class="accroche">6 points à retenir</p>
+        </div>
+        <section id='scroll7'>
+            <div class='scroll__graphic sticky'>
+                <div class='row' style="width: 90em; ">
+                    <div class='col-sm-1'> </div>
+                    <div class='col-sm-10'>
+                        <ol class="custom-counter">
+                            <li id="point1">
+                                Les déplacements domicile-travail de la Région Occitanie se structurent en deux grands espaces : 1. Toulouse et sa périphérie ; 2. Le littoral méditerranéen.
+                            </li>
+                            <li class="" id="point2">
+                                Plusieurs aires de polarisation des déplacements (caractérisés par de plus fortes entrées que de départs) organisent ces deux grands espaces. Ces aires sont basées sur un modèle centre-périphérie.
+                            </li>
+                            <li class="" id="point3">
+                                A l'inverse, 70 % du territoire occitan manque de dynamisme. En effet, les communes en question sont caractérisées par un faible flux de déplacements professionnels, un revenu médian inférieur au reste de la Région et une faible densité d'emplois.
+                            </li>
+                            <li class="" id="point4">
+                               Les communes les plus attractives sont également celles qui enregistrent le plus grand nombre de mouvements internes. Les personnes qui y résident et qui y travaillent sont principalement des cadres. A l'inverse, les communes connaissant des balances de déplacements déficitaires verront leurs habitants se rendre au travail en utilisant principalement l'automobile. 
+                            </li>
+                            <li class="" id="point5">
+                                Dans l'espace littoral méditerranéen, ces mouvements intercommunaux seront principalement constitués par des travailleurs appartenant à la catégorie "ouvriers/employés, tandis que dans l'espace de Toulouse et de sa périphérie, ces déplacements sont plus hétéroclites, constitués de cadres, de professions intermédiaires et d'ouvriers/employés.
+                            </li>
+                            <li class="" id="point6">
+                                Enfin, dans un contexte de réchauffement climatique, il devient urgent de réduire progressivement les émissions de CO2 dans les différentes aires de polarisation. Des solutions existent : rapprocher lieu de travail et lieu de résidence, développement du télétravail, promouvoir les modes de transport doux (vélo, à pied, tram, métro...).
+                            </li>
+                        </ol>
+                    </div>
+                    <div class='col-sm-1'> </div>
+                </div>
+            </div>
+            <div class='scroll__text right'>
+                <div class='step steppy' data-step='point1'>
+                </div>
+                <div class='step steppy' data-step='point2'>
+                </div>
+
+            </div>
+        </section>
+        <div class="bandeauSub" >
+            <hr>
+            <p class="accroche" style="text-align: justify !important;">Informations sur les outils et les données utilisés : 
+                <li style="margin-left: 100px">Jeu de données fourni par l'association toulouse-Dataviz dans le cadre du Hackaviz 2019
+                </li><li style="margin-left: 100px">Pour le traitement des données : QGIS, Excel, Python
+                </li><li style="margin-left: 100px">Visualisation cartographique : Mapbox, Mapbox API pour les itinéraires entre deux communes
+                </li><li style="margin-left: 100px">Visualisation graphique et traitements : D3.js, C3.js
+                </li><li style="margin-left: 100px">Outil de scrollytelling : Scrollama.js
+            </li></p>
+        </div>
+        <div class="bandeauSub" >
+            <p class="accroche" style="font-color: black !important">Réalisation : ©Tony Hauck 
+            </p>
+        </div>
+    </main>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+    <script src='https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js'></script>
+    <script src='https://cdn.rawgit.com/russellgoldenberg/scrollama/master/docs/stickyfill.min.js'></script>
+    <script src='https://unpkg.com/scrollama@0.6.1/build/scrollama.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.14/c3.min.js'></script>
+    <script>
+
+    $('#slider3').hide();
+    $('.display').hide();
+    //Calculer la taille de la fenêtre et du document entier, stocker dans des variables
+    hauteur = $(window).height();
+    largeur = $(window).width();
+    hauteurGene = $(document).height()
+    $(".bandeau").css("top", function() {
+        hauteur_cadre = $(this).height()
+        le_padding = parseInt($(".bandeau").css("padding-top").slice(0, -2))
+        le_padding3 = parseInt($(".bandeau").css("padding-bottom").slice(0, -2))
+        return (hauteur - (hauteur_cadre + le_padding + le_padding3)) / 2
+    })
+    $(".bandeaufleche").css("top", function() {
+        hauteur_cadre = $(this).height()
+        le_padding = parseInt($(".bandeau").css("padding-top").slice(0, -2))
+        le_padding3 = parseInt($(".bandeau").css("padding-bottom").slice(0, -2))
+        return (hauteur - (hauteur_cadre + le_padding + le_padding3)) / 1.1
+    })
+
+    function init(selector) {
+        // using d3 for convenience
+        var container = d3.select(selector);
+        var graphic = container.select(".scroll__graphic");
+        var text = container.select(".scroll__text");
+        var step = text.selectAll(".step");
+
+        // initialize the scrollama
+        var scroller = scrollama();
+
+        // scrollama event handlers
+        function handleStepEnter(response) {
+            // response = { element, direction, index }
+
+            // add color to current step only
+            step.classed("is-active", function(d, i) {
+                return i === response.index;
+            });
+
+            // update graphic based on step
+            console.log(response.element.dataset.step);
+            if (response.element.dataset.step == 'Intro') {
+
+                map.flyTo({
+                    center: [1.43, 43.600000],
+                    zoom: 6
+                });
+            }
+            if (response.element.dataset.step == 'Toulouse') {
+
+                map.flyTo({
+                    center: [
+                        1.44367, 43.6043
+                    ],
+                    zoom: 8
+                });
+            }
+
+            if (response.element.dataset.step == 'littoral') {
+
+                map.flyTo({
+                    center: [
+                        3.69278, 43.4028
+                    ],
+                    zoom: 8
+                });
+            }
+            if (response.element.dataset.step == 'intro2') {
+
+                map2.flyTo({
+                    center: [1.43, 43.600000],
+                    zoom: 6
+                });
+            }
+            if (response.element.dataset.step == 'bezier') {
+                map2.flyTo({
+                    center: [
+                        3.21402, 43.34122
+                    ],
+                    zoom: 10
+                });
+            }
+
+            if (response.element.dataset.step == 'toulouseCity') {
+
+                map2.flyTo({
+                    center: [
+                        1.44367, 43.6043
+                    ],
+                    zoom: 10
+                });
+            }
+
+            if (response.element.dataset.step == 'occitanieDyna') {
+
+                map2.flyTo({
+                    center: [1.43, 43.600000],
+                    zoom: 6
+                });
+            }
+            if (response.element.dataset.step == 'reloadFilter') {
+
+                /*                //Déclaration de l'array vide
+                                //On récupère la value du slider 
+                                var median2 = 100000;
+                                document.getElementById('revenu').innerText = median2.toLocaleString() + ' €';
+
+                                var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median2];
+                                map3.setFilter('blabla2', ['all', filterMedian])
+                                getChiffreCle(median2)*/
+            }
+
+            if (response.element.dataset.step == 'jouons') {
+
+                //Déclaration de l'array vide
+                //On récupère la value du slider 
+                var median2 = 12000;
+                document.getElementById('revenu').innerText = median2.toLocaleString() + ' €';
+                $('#slider3').show()
+                var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median2];
+                map3.setFilter('blabla2', ['all', filterMedian])
+                getChiffreCle(median2)
+
+                /* $('body').animate({backgroundColor: '#CD3333'}, 'fast');*/
+            }
+
+
+            if (response.element.dataset.step == 'jouez') {
+
+
+            }
+
+            if (response.element.dataset.step == 'ToulouseGrandRond') {
+                if (document.getElementById("patternPositif") == null) {
+
+                } else {
+                    $('#patternPositif').remove()
+                }
+            }
+            if (response.element.dataset.step == 'patternPositif') {
+                if (document.getElementById("patternNegatif") == null) {
+
+                } else {
+                    $('#patternNegatif').remove()
+                }
+                if (document.getElementById("patternPositif") !== null) {
+
+                } else {
+                    d3.select('#svgTriangle').append("rect")
+                        .attr('id', 'patternPositif')
+                        .attr('class', 'rect')
+                        .attr("x", document.getElementById("TOULOUSE").cy.baseVal.value - 50)
+                        .attr("y", document.getElementById("CARCASSONNE").cx.baseVal.value - 20)
+                        .attr("width", 200)
+                        .attr("height", 220)
+                        .attr("stroke-width", 3)
+                        .attr("fill", "rgba(0,0,0,0.3)")
+                        .attr("stroke", "green");
+                }
+            }
+            if (response.element.dataset.step == 'patternNegatif') {
+                if (document.getElementById("patternNegatif") !== null) {
+
+                } else {
+                    d3.select('#svgTriangle').append("rect")
+                        .attr('id', 'patternNegatif')
+                        .attr('class', 'rect2')
+                        .attr("x", document.getElementById("LAHITTE").cy.baseVal.value - 80)
+                        .attr("y", document.getElementById("CAPENDU").cx.baseVal.value - 80)
+                        .attr("width", 200)
+                        .attr("height", 200)
+                        .attr("stroke-width", 3)
+                        .attr("fill", "rgba(0,0,0,0.3)")
+                        .attr("stroke", "red");
+                }
+            }
+
+            if (response.element.dataset.step == 'point2') {
+
+                /*$('#point2').show()*/
+            }
+            if (response.element.dataset.step == 'point3') {
+
+                /*$('#point3').show()*/
+            }
+            if (response.element.dataset.step == 'point4') {
+
+                /*$('#point4').show()*/
+            }
+            if (response.element.dataset.step == 'point5') {
+
+                /*$('#point5').show()*/
+                /*$('#point6').show()*/
+            }
+            if (response.element.dataset.step == 'point6') {
+
+
+            }
+
+        }
+
+        function handleContainerEnter(response) {
+            // response = { direction }
+        }
+
+        function handleContainerExit(response) {
+            // response = { direction }
+        }
+
+        (function setupStickyfill() {
+            d3.selectAll(".sticky").each(function() {
+                Stickyfill.add(this);
+            });
+        })();
+
+        // 1. force a resize on load to ensure proper dimensions are sent to scrollama
+        // generic window resize listener event
+        function handleResize() {
+            // 1. update height of step elements
+            var stepHeight = Math.floor(window.innerHeight * 0.75);
+            step.style("height", stepHeight + "px");
+
+            // 2. update width/height of graphic element
+            var bodyWidth = d3.select("body").node().offsetWidth;
+
+            var graphicMargin = 16 * 4;
+            var textWidth = text.node().offsetWidth;
+            var graphicWidth = container.node().offsetWidth - textWidth - graphicMargin;
+            var graphicHeight = Math.floor(window.innerHeight / 2);
+            var graphicMarginTop = Math.floor(graphicHeight / 2);
+
+            graphic
+                .style("width", window.innerWidth + "px")
+                .style("height", window.innerHeight + "px")
+                .style("top", 0);
+
+            // graphic
+            //   .style('width', '100%')
+            //   .style('height', '100vh')
+            //   .style('top', 0);
+
+            // 3. tell scrollama to update new element dimensions
+            scroller.resize();
+        }
+
+        // 2. setup the scroller passing options
+        // this will also initialize trigger observations
+        // 3. bind scrollama event handlers (this can be chained like below)
+        scroller
+            .setup({
+                container: selector,
+                graphic: ".scroll__graphic",
+                text: ".scroll__text",
+                step: ".scroll__text .step",
+                debug: false,
+                offset: 0.83
+            })
+            .onStepEnter(handleStepEnter)
+            .onContainerEnter(handleContainerEnter)
+            .onContainerExit(handleContainerExit);
+
+        // setup resize event
+        window.addEventListener("resize." + selector.substr(1), handleResize);
+        handleResize();
+    }
+
+    // kick things off
+    init("#scroll");
+    init("#scroll2");
+    init("#scroll3");
+    init("#scroll4");
+    init("#scroll5");
+    init("#scroll6");
+    init("#scroll7");
+    init("#scroll8");
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*GRAPHIQUE 1 : CARTE DES FLUX */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    const ALPHA = 0.01;
+
+    const rainbow = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    const rainbowInverse = [
+        [148, 0, 211], // 'darkviolet'
+        [0, 0, 255], // 'blue'
+        [65, 105, 225], // 'royalblue'
+        [0, 255, 255], // 'cyan'
+        [0, 255, 0], // 'lime',
+        [255, 255, 0], // 'yellow',
+        [255, 165, 0], // 'orange',
+        [255, 0, 0] // 'red'
+    ];
+
+    function makeGradient(z, sens) {
+        if (sens == 'work') {
+            let gradient = rainbowInverse.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        } else {
+            let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        }
+        let gradient = rainbow.map((a, i) => [i / 7, a.concat(ALPHA)]);
+        gradient = gradient.concat([z, z - 0.02, z + 0.02].map(p => [p, undefined]));
+        gradient.sort((a, b) => a[0] - b[0]);
+
+        let which = 0;
+        for (let i = 0; i < gradient.length; i++) {
+            if (gradient[i][1]) continue;
+            gradient[i][1] = tween(i, which, gradient);
+            which++;
+            if (which === 3) break;
+        }
+
+        const deduped = gradient.reduce((a, stop, i) => {
+            if (i && a[a.length - 1][0] === stop[0]) {
+                if (stop[1][3] === 1) {
+                    a[a.length - 1][1][3] = 1;
+                }
+            } else {
+                if (stop[0] <= 1 || a[a.length - 1][1][3] !== 1)
+                    a.push(stop);
+            }
+
+            return a;
+        }, []).map(stop => [stop[0], `rgba(${stop[1].join(',')})`]);
+
+        return Array.prototype.concat.apply([
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+        ], deduped);
+    }
+
+    function tween(i, which, gradient) {
+        const x = gradient[i];
+        let prev = x,
+            next = x,
+            j = i,
+            jd = -1
+        k = i,
+            kd = 1;
+        while (!prev[1]) {
+            if (j === 0) jd *= -1;
+            j += jd;
+            prev = gradient[j];
+        }
+
+        while (!next[1]) {
+            if (k === gradient.length - 1) kd *= -1;
+            k += kd;
+            next = gradient[k];
+        }
+
+        const t = (next[0] === prev[0]) ? 0 : (x[0] - prev[0]) / (next[0] - prev[0]);
+
+        const interpolated = prev[1].map((el, i) =>
+            el + (next[1][i] - el) * t
+        );
+        if (which === 1) interpolated[3] = 1;
+        else interpolated[3] = ALPHA;
+        return interpolated;
+    }
+
+
+    var tile = 'data_par_trajet-dgqfqo'
+    var url = 'mapbox://tonyh70.9n1edek3'
+    mapboxgl.accessToken = 'pk.eyJ1IjoidG9ueWg3MCIsImEiOiJCd2NPU2pVIn0.IvZwW3UjZRpcobZK1-QfdQ';
+    //Init de la map 
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 6
+    });
+
+    // set the bounds of the map
+    var bounds = [
+        [-2.362835741, 40.3920234558],
+        [5.9610412121, 48.1122782548]
+    ];
+    /*[[[-0.762835741,42.3920234558],[4.9610412121,42.3920234558],[4.9610412121,46.1122782548],[-0.762835741,46.1122782548],[-0.762835741,42.3920234558]]]*/
+    /*    map.setMaxBounds(bounds);*/
+
+    // initialize the map canvas to interact with later
+    var canvas = map.getCanvasContainer();
+    //Initialisation des variables globales
+    var count = 0;
+    var trajet = [];
+    var lineTrajet = [];
+    var start = [];
+    var end = [];
+
+
+    map.on('load', function() {
+        var nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'bottom-right');
+        // disable map zoom when using scroll
+        map.scrollZoom.disable();
+        /*        map.addLayer({
+                    "id": "blabla",
+                    "type": "circle",
+                        "source": {
+                          "type": 'geojson',
+                          "data": './donnees_trajet/data_par_trajet.geojson' // replace this with the url of your own geojson
+                        },
+                    paint: {
+                        'circle-color': 'black',
+                        'circle-opacity': 0.3
+                    },
+                });*/
+        var latitude = 42.89347078;
+        var longitude = 1.952743897;
+        var coordonneesPoint = [longitude, latitude];
+
+        map.addSource('line', {
+            'type': 'geojson',
+            'lineMetrics': true,
+            'data': './donnees_trajet/map.geojson'
+        });
+
+        map.addLayer({
+            'type': 'line',
+            'source': 'line',
+            'id': 'line',
+            'paint': {
+                /*'line-width': 0,*/
+                /*'line-gradient': makeGradient(0)*/
+                //data-driven style for line offset
+                /*                        "line-width": {
+                                                        "type": "exponential",
+                                                        "base": 2,
+                                                        "stops": [
+                                                            [0, 10 * Math.pow(2, (0 - 20))],
+                                                            [100, 10 * Math.pow(2, (24 - 20))]
+                                                        ]
+                                                    },*/
+            },
+            'layout': {
+                'line-cap': 'round',
+                'line-join': 'round'
+            }
+        });
+
+
+        let interval;
+
+        setTimeout(() => {
+            if ($('#switch-orange').is(":checked")) {
+                console.log("Travail");
+                runGradient();
+            } else {
+                console.log("Domicile");
+                runGradientInverse()
+            }
+        }, 20);
+
+    })
+
+
+    $("#switch-orange").change(function() {
+        if ($('#switch-orange').is(":checked")) {
+            runGradient();
+        } else {
+            console.log("Domicile");
+            runGradientInverse()
+        }
+    })
+
+    let interval;
+
+    function runGradient() {
+        var sens = 'work';
+        if (interval) clearInterval(interval);
+        let i = 0;
+        map.setPaintProperty('line', 'line-gradient', makeGradient(0));
+        interval = setInterval(() => {
+            i += 0.005;
+            if (i >= 1) {
+                map.setPaintProperty('line', 'line-gradient', makeGradient(1));
+                map.setPaintProperty('line', 'line-width', 20);
+                /*clearInterval(interval);*/
+                i = 0
+            } else {
+                map.setPaintProperty('line', 'line-gradient', makeGradient(i, sens));
+                map.setPaintProperty('line', 'line-width', 3);
+            }
+        }, 20);
+    }
+
+    function runGradientInverse() {
+        var sens = 'home';
+        if (interval) clearInterval(interval);
+        let i = 1;
+        map.setPaintProperty('line', 'line-gradient', makeGradient(0));
+        interval = setInterval(() => {
+            i -= 0.003;
+            if (i <= 0) {
+                map.setPaintProperty('line', 'line-gradient', makeGradient(1));
+                /*map.setPaintProperty('line', 'line-width', 20);*/
+                /*clearInterval(interval);*/
+                i = 1
+            } else {
+                map.setPaintProperty('line', 'line-gradient', makeGradient(i, sens));
+                map.setPaintProperty('line', 'line-width', 3);
+            }
+        }, 20);
+    }
+
+
+    d3.select('#sliderTrajet').on('change', function(a, f) {
+        //Déclaration de l'array vide
+        var polygonsFiltres = [];
+
+        //On récupère la value du slider 
+        var median2 = parseInt($('#sliderTrajet').val());
+        if (median2 < 100) {
+            document.getElementById('nombreActif').innerText = ' 100';
+        } else {
+            document.getElementById('nombreActif').innerText = median2.toLocaleString();
+        }
+
+
+        var filterMedian = ['<=', ['number', ['get', 'qtite_extra']], median2];
+        /*       var filterMobility = ['<=', ['number', ['get', '2014_extra_communes']], 0];
+               map.setFilter('blabla', ['all', filterMedian, filterMobility])
+               var filterMedian = ['<=', ['number', ['get', 'nombreActif_med']], median2];*/
+        map.setFilter('line', ['all', filterMedian])
+
+        //Query sur la couche pour récupérer les propriétés des polygons filtrés
+        var results = map.querySourceFeatures('line', {
+            filter: ['<=', ['number', ['get', 'qtite_extra']], median2],
+        });
+        //On boucle pour pusher les données dans un array 
+        for (var i = 0; i < results.length; i++) {
+            polygonsFiltres.push(results[i]);
+        }
+        var resArr = [];
+        polygonsFiltres.filter(function(item) {
+            var i = resArr.findIndex(x => (x.properties.commune == item.properties.commune));
+            if (i <= -1) {
+                resArr.push(item);
+            }
+            return null;
+        });
+        var meanPop = d3.max(resArr, function(d) { return +d.properties.qtite_extra; });
+        console.log(meanPop);
+
+    })
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*GRAPHIQUE 1 : CARTE DES BALANCES */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    $('#Balance').prop('checked', true)
+    $('#deplacements').prop('checked', true)
+    /*    $('#Entrants').prop('checked', false)
+        $('#Sortants').prop('checked', false)*/
+    //Init de la map 
+    var map2 = new mapboxgl.Map({
+        container: 'map2', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 6
+    });
+
+    // set the bounds of the map2
+    var bounds = [
+        [-2.362835741, 40.3920234558],
+        [5.9610412121, 48.1122782548]
+    ];
+    /*[[[-0.762835741,42.3920234558],[4.9610412121,42.3920234558],[4.9610412121,46.1122782548],[-0.762835741,46.1122782548],[-0.762835741,42.3920234558]]]*/
+    /*    map2.setMaxBounds(bounds);*/
+
+    // initialize the map2 canvas to interact with later
+    var canvas = map2.getCanvasContainer();
+    //Initialisation des variables globales
+    var count = 0;
+    var trajet = [];
+    var lineTrajet = [];
+    var start = [];
+    var end = [];
+
+
+    map2.on('load', function() {
+        var nav = new mapboxgl.NavigationControl();
+        map2.addControl(nav, 'bottom-right');
+        // disable map zoom when using scroll
+        map2.scrollZoom.disable();
+        map2.addSource('domicile-travail', {
+            'type': 'geojson',
+            'lineMetrics': true,
+            'data': './donnees_trajet/map.geojson'
+        });
+
+        map2.addLayer({
+            'id': 'domicile-travail',
+            'type': 'line',
+            'source': 'domicile-travail',
+            'layout': {
+                'line-cap': 'round',
+                'line-join': 'round'
+            },
+        });
+
+
+
+        map2.addLayer({
+            'id': 'balance',
+            'type': 'circle',
+            "source": {
+                "type": 'geojson',
+                "data": 'données_commune/par_communev4.geojson' // replace this with the url of your own geojson
+            },
+            /*            'filter': ['all', [">", "Balance", '10000000']],*/
+            'paint': {
+                "circle-color": {
+                    "property": "Balance",
+                    "stops": [
+
+                        [0, "red"],
+                        [1, "green"],
+                        [100000, "green"]
+                    ],
+                },
+                'circle-opacity': 0.7,
+                'circle-radius': {
+                    property: 'Balance',
+                    stops: [
+                        [{ zoom: 8, value: -7000 }, 10],
+                        [{ zoom: 8, value: -2151 }, 5],
+                        [{ zoom: 8, value: 0 }, 3],
+                        [{ zoom: 8, value: 2151 }, 5],
+                        [{ zoom: 8, value: 9077 }, 12],
+                        [{ zoom: 8, value: 43660 }, 20],
+                        [{ zoom: 8, value: 87000 }, 30],
+                    ]
+                }
+            }
+        });
+        /*map2.addLayer({
+            'id': 'entrants',
+            'type': 'circle',
+
+            "source": {
+                "type": 'geojson',
+                "data": 'données_commune/par_communev4.geojson' // replace this with the url of your own 
+            },
+            'paint': {
+                "circle-color": {
+                    "property": "total_personne_entrante",
+                    "stops": [
+
+                        [0, "red"],
+                        [1, "green"],
+                        [100000, "green"]
+                    ],
+                },
+                'circle-opacity': 0.7,
+                'circle-radius': {
+                    property: 'total_personne_entrante',
+                    stops: [
+                        [{ zoom: 8, value: -7000 }, 10],
+                        [{ zoom: 8, value: -2151 }, 5],
+                        [{ zoom: 8, value: 0 }, 3],
+                        [{ zoom: 8, value: 2151 }, 5],
+                        [{ zoom: 8, value: 9077 }, 12],
+                        [{ zoom: 8, value: 43660 }, 20],
+                        [{ zoom: 8, value: 87000 }, 30],
+                    ]
+                }
+            }
+        });*/
+
+
+        let interval2;
+
+        setTimeout(() => {
+
+            runGradient2();
+
+
+        }, 20);
+
+        //Query sur la couche pour récupérer les propriétés des polygons filtrés
+        var filterMedian = ['<', ['number', ['get', 'Balance']], 10000000];
+        /*       var filterMobility = ['<=', ['number', ['get', '2014_extra_communes']], 0];
+               map2.setFilter('blabla', ['all', filterMedian, filterMobility])
+               var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median2];*/
+        map2.setFilter('balance', ['all', filterMedian])
+    });
+
+    let interval2;
+
+    function runGradient2() {
+        var sens = 'work';
+        if (interval2) clearInterval(interval2);
+        let i = 0;
+        map2.setPaintProperty('domicile-travail', 'line-gradient', makeGradient(0));
+        interval2 = setInterval(() => {
+            i += 0.005;
+            if (i >= 1) {
+                map2.setPaintProperty('domicile-travail', 'line-gradient', makeGradient(1));
+                map2.setPaintProperty('domicile-travail', 'line-width', 20);
+                /*clearInterval(interval);*/
+                i = 0
+            } else {
+                map2.setPaintProperty('domicile-travail', 'line-gradient', makeGradient(i, sens));
+                map2.setPaintProperty('domicile-travail', 'line-width', 3);
+            }
+        }, 20);
+    }
+
+
+    // Create a popup, but don't add it to the map2 yet.
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    map2.on('mouseenter', 'balance', function(e) {
+        // Change the cursor style as a UI indicator.
+        map2.getCanvas().style.cursor = 'pointer';
+
+        if (e.features[0].properties.total_personne_entrante > e.features[0].properties.total_personne_partante) {
+            var color = 'green';
+        } else {
+            var color = 'red';
+        }
+        if (e.features[0].properties.total_personne_entrante > e.features[0].properties.total_personne_partante) {
+            var sign = '+';
+        } else {
+            var sign = '';
+        }
+        var coordinates = e.features[0].geometry.coordinates.slice();
+        var description = "Commune de " + e.features[0].properties.commune + '<br>' +
+            "<span style='font-weight:bold; color:" + color + "'> Balance des déplacements entrants et sortants : " + sign + (e.features[0].properties.Balance).toLocaleString() + "</span><br>" +
+            "Nombre de déplacements entrants sur la commune" + "<span> " + '+' + (e.features[0].properties.total_personne_entrante).toLocaleString() + "</span>" + "<br>" +
+            "Nombre de déplacements sortants sur la commune" + "<span> " + '-' + (e.features[0].properties.total_personne_partante).toLocaleString() + "</span>";
+
+        // Ensure that if the map22 is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map2);
+    });
+
+    map2.on('mouseleave', 'balance', function() {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+    });
+
+    $('#deplacements').on('click', function() {
+        var check = $(this).attr('checked');
+        if ($(this).is(":checked")) {
+            map2.setLayoutProperty('domicile-travail', 'visibility', 'visible');
+        } //'checked' event code
+        else {
+            map2.setLayoutProperty('domicile-travail', 'visibility', 'none');
+        }
+    });
+    $('#Balance').on('click', function() {
+        var check = $(this).attr('checked');
+        if ($(this).is(":checked")) {
+            map2.setLayoutProperty('balance', 'visibility', 'visible');
+        } //'checked' event code
+        else {
+            map2.setLayoutProperty('balance', 'visibility', 'none');
+        }
+    });
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*GRAPHIQUE 1 : CARTE DES OUBLIES */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    //Init de la map 
+    var map3 = new mapboxgl.Map({
+        container: 'map3', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 6
+    });
+
+    //Initialisation des variables globales
+    var populationTotale = 5730753;
+    var surfaceTotale = 7243041;
+    var emploiTot = 670136;
+    var start = [];
+    var end = [];
+
+    var median2 = parseInt($('#slider2').val());
+    document.getElementById('revenu').innerText = median2.toLocaleString() + ' €';
+
+    map3.on('load', function() {
+        /*        var nav = new mapboxgl.NavigationControl();
+                map3.addControl(nav, 'bottom-right');*/
+        // disable map3 zoom when using scroll
+        map3.scrollZoom.disable();
+
+        var filterRevenu = ["<", "revenu_med", median2];
+
+        map3.addLayer({
+            "id": "blabla2",
+            "type": "fill",
+            "source": {
+                "type": 'geojson',
+                "data": './donnees_commune/par_commune_oublies.json' // replace this with the url of your own geojson
+            },
+            /*            'filter': ['all', filterRevenu],*/
+            paint: {
+                'fill-color': 'grey ',
+                'fill-outline-color': 'rgba(255,255,255,0.0)',
+                'fill-opacity': 0.7
+            },
+        });
+
+    })
+
+
+
+    //FILTER 
+    d3.select('#slider4').on('change', function(a, f) {
+        //Déclaration de l'array vide
+        //On récupère la value du slider 
+        var median3 = parseInt($('#slider4').val());
+        console.log(median3)
+        document.getElementById('revenu').innerText = median3.toLocaleString() + ' €';
+
+        var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median3];
+        /*       var filterMobility = ['<=', ['number', ['get', '2014_extra_communes']], 0];
+               map.setFilter('blabla', ['all', filterMedian, filterMobility])
+               var filterMedian = ['<=', ['number', ['get', 'revenu_med']], median3];*/
+        map3.setFilter('blabla2', ['all', filterMedian])
+        getChiffreCle(median3)
+    })
+
+    function getChiffreCle(median2) {
+        var polygonsFiltres = [];
+        //Query sur la couche pour récupérer les propriétés des polygons filtrés
+        var results = map3.querySourceFeatures('blabla2', {
+            filter: ['<=', ['number', ['get', 'revenu_med']], median2],
+        });
+
+        //On boucle pour pusher les données dans un array 
+        for (var i = 0; i < results.length; i++) {
+            polygonsFiltres.push(results[i]);
+        }
+        var resArr = [];
+        polygonsFiltres.filter(function(item) {
+            var i = resArr.findIndex(x => (x.properties.commune == item.properties.commune));
+            if (i <= -1) {
+                resArr.push(item);
+            }
+            return null;
+        });
+        console.log(resArr.length)
+        document.getElementById('numCom').innerText = resArr.length;
+        var sumEmp = d3.sum(resArr, function(d) { return +d.properties.emplois; });
+        var sumEmp = parseInt(sumEmp);
+        document.getElementById('emploi').innerText = Math.round((sumEmp / emploiTot) * 100) + ' % de la population totale de la région (soit un total de ' + sumEmp.toLocaleString() + " d'emplois)";
+
+        var sumPop = d3.sum(resArr, function(d) { return +d.properties.habitants; });
+        var sumPop = parseInt(sumPop);
+        document.getElementById('popMoyenne').innerText = Math.round((sumPop / populationTotale) * 100) + ' % de la population totale de la région (soit un total de ' + sumPop.toLocaleString() + ' personnes)';
+
+        var meanRevenu = d3.mean(resArr, function(d) { return +d.properties.revenu_med; });
+        var meanRevenu = parseInt(meanRevenu);
+        document.getElementById('revenuMoyen').innerText = "Revenu moyen annuel de " + meanRevenu.toLocaleString() + ' €';
+
+        var meanAlti = d3.mean(resArr, function(d) { return +d.properties.altitude_m; });
+        var meanAlti = parseInt(meanAlti);
+        document.getElementById('altitude').innerText = "Altitude moyenne des communes : " + meanAlti.toLocaleString() + ' m';
+
+        var sumSurface = d3.sum(resArr, function(d) { return +d.properties.superficie; });
+        var sumSurface = parseInt(sumSurface);
+
+        document.getElementById('surface').innerText = ' Une absence ou un flux de déplacements très réduit conernant ' + Math.round((sumSurface / surfaceTotale) * 100) + " % de la surface totale d'Occitanie";
+
+        let obj = {};
+        console.log(resArr)
+        resArr.forEach(entry => (obj[entry.properties.departem_1] = (obj[entry.properties.departem_1] || 0) + 1));
+        let array2 = [];
+        for (departem_1 in obj) {
+            console.log(obj);
+            array2.push([departem_1, obj[departem_1]]);
+        }
+
+        console.log(array2);
+
+        var chart = c3.generate({
+            bindto: '#piechart',
+            data: {
+                // iris data from R
+                columns: array2,
+                type: 'pie',
+            },
+            tooltip: {
+                position: function(data, width, height, element) {
+                    return { top: 20, left: 0 };
+                }
+            }
+        });
+    }
+
+
+
+    var chart = c3.generate({
+        bindto: '#piechart',
+        data: {
+            // iris data from R
+            columns: [
+                ['ARIEGE', 304],
+                ['AUDE', 353],
+                ['AVEYRON', 228],
+                ['GARD', 223],
+                ['GERS', 429],
+                ['HAUTE-GARONNE', 401],
+                ['HAUTES-PYRENEES', 425],
+                ['HERAULT', 189],
+                ['LOT', 283],
+                ['LOZERE', 155],
+                ['PYRENEES-ORIENTALES', 145],
+                ['TARN', 241],
+                ['TARN-ET-GARONNE', 145],
+            ],
+            type: 'pie',
+        },
+        tooltip: {
+            position: function(data, width, height, element) {
+                return { top: 20, left: 0 };
+            }
+        }
+    });
+    </script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src='js/circleLegend.js'></script>
+    <script type="text/javascript">
+    hauteur = $(window).height();
+    largeur = $(window).width();
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*TERNARY PLOT ! */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //Fonction graphique des cadres,inter,ouvriers
+    function ternaryPlot(selector, userOpt) {
+
+        var plot = {
+            dataset: []
+        };
+
+        var opt = {
+            width: $(window).width(),
+            height: $(window).height(),
+            side: $(window).width(),
+            margin: { top: 20, left: 50, bottom: 50, right: 50 },
+            axis_labels: ['A', 'B', 'C'],
+            axis_ticks: [0, 2, 4, 6, 8, 10],
+            tickLabelMargin: 10,
+            axisLabelMargin: 10
+        }
+
+        for (var o in userOpt) {
+            opt[o] = userOpt[o];
+        }
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        var svgPrin = d3.select(selector).append('svg')
+            .attr('id', 'svgTriangle')
+            .attr("width", opt.width)
+            .attr("height", opt.height);
+
+        var axes = svgPrin.append('g').attr('class', 'axes');
+
+        var w = opt.side;
+        var h = Math.sqrt(opt.side * opt.side - (opt.side / 2) * (opt.side / 2));
+
+        var corners = [
+            [opt.margin.left, h + opt.margin.top], // a
+            [w + opt.margin.left, h + opt.margin.top], //b 
+            [(w / 2) + opt.margin.left, opt.margin.top], //c 
+        ]
+
+        var labels = [
+            [opt.margin.left + 20, (h / 2) + opt.margin.top - 10, -60], // data
+            [(w / 2) + opt.margin.left + 5, h + opt.margin.top + 50, 0], // eng 
+            [opt.margin.left + w - 20, (h / 2) + opt.margin.top - 10, +60], // designer
+        ]
+
+        //axis names
+        axes.selectAll('.axis-title')
+            .data(opt.axis_labels)
+            .enter()
+            .append('g')
+            .attr('class', 'axis-title')
+            .append('text')
+            .text(function(d) { return d; })
+            .attr('transform', function(d, i) {
+                return 'translate(' + labels[i][0] + ',' + labels[i][1] + ')rotate(' + labels[i][2] + ')';
+                //return 'translate('+corners[i][0]+','+corners[i][1]+')';
+            })
+            .attr('text-anchor', 'middle')
+        var n = opt.axis_ticks.length;
+        var tickLabelLookup = {
+            0: 'Faible',
+            10: 'Fort',
+        };
+        opt.axis_ticks.forEach(function(v) {
+            var coord1 = coord([v, 0, 10 - v]);
+            var coord2 = coord([v, 10 - v, 0]);
+            var coord3 = coord([0, 10 - v, v]);
+            var coord4 = coord([10 - v, 0, v]);
+
+            axes.append("line")
+                .attr(lineAttributes(coord1, coord2))
+                .classed('a-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord2, coord3))
+                .classed('b-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord3, coord4))
+                .classed('c-axis tick', true);
+
+
+            //tick labels
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord1[0] + ',' + coord1[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(-10,0)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[v]; })
+                .classed('a-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord2[0] + ',' + coord2[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(10,20)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[10 - v]; })
+                .classed('b-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord3[0] + ',' + coord3[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(5,0)')
+                .text(function(d) { return tickLabelLookup[v]; })
+                .attr('x', opt.tickLabelMargin)
+                .classed('c-axis tick-text', true);
+
+        })
+
+        function lineAttributes(p1, p2) {
+            return {
+                x1: p1[0],
+                y1: p1[1],
+                x2: p2[0],
+                y2: p2[1]
+            };
+        }
+
+        function coord(arr) {
+            var a = arr[0],
+                b = arr[1],
+                c = arr[2];
+            var sum, pos = [0, 0];
+            sum = a + b + c;
+            if (sum !== 0) {
+                a /= sum;
+                b /= sum;
+                c /= sum;
+                pos[0] = corners[0][0] * a + corners[1][0] * b + corners[2][0] * c;
+                pos[1] = corners[0][1] * a + corners[1][1] * b + corners[2][1] * c;
+            }
+            return pos;
+        }
+
+        //bind by is the dataset property used as an id for the join
+        plot.data = function(data, accessor, bindBy) {
+
+            var circs = [];
+
+
+            plot.dataset = data;
+
+            var circles = svgPrin.selectAll("circle")
+                .data(data.map(function(d) { return coord(accessor(d)); }), function(d, i) {
+                    if (bindBy) {
+                        if (plot.dataset[i].balance < 0) {
+                            /*  circs.push((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                            circs.push((plot.dataset[i].balance * -1))
+                        } else {
+                            circs.push((plot.dataset[i].balance))
+                        }
+                        return plot.dataset[i][bindBy];
+                    }
+                    return i;
+                });
+            console.log(circs)
+            var rscale = d3.scale.linear()
+                .domain([0, d3.max(circs)])
+                .range([3, 40]);
+
+            circles.enter().append("circle");
+
+            circles.transition().attr("cx", function(d) { return d[0]; })
+                .attr('id', function(d, i) { return plot.dataset[i][bindBy] })
+                .attr("cy", function(d) { return d[1]; })
+                .attr('fill', function(d, i) {
+                    if (plot.dataset[i].balance < 0) {
+                        return 'red'
+                    } else {
+                        return 'green'
+                    }
+                })
+                .attr("r", function(d, i) {
+                    if (plot.dataset[i].balance > 0) {
+                        var point = plot.dataset[i].balance;
+                        return rscale((point))
+                        /*return rscale((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                    } else {
+                        var point = plot.dataset[i].balance * -1;
+                        return rscale((point))
+                    }
+                });
+
+            circles
+                .on("mouseover", function(d, i) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+                    var balance = (plot.dataset[i].balance).toLocaleString();
+                    var inter_voiture = (plot.dataset[i].inter_voiture).toLocaleString();
+                    var extra_voiture = (plot.dataset[i].extra_voiture).toLocaleString();
+                    var sansvoiture = (plot.dataset[i].sansvoiture).toLocaleString();
+                    div.html('<b> Balance à ' + plot.dataset[i].label + ' : ' + balance +
+                            ' déplacements</b><br>Déplacement interne en voiture: ' + (inter_voiture) +
+                            ' déplacements</b><br>Déplacement externe en voiture: ' + (extra_voiture) +
+                            ' déplacements</b><br>Déplacement sans voiture: ' + (sansvoiture) + ' déplacements')
+                        .style("left", (d3.event.pageX + 58) + "px")
+                        .style("top", (d3.event.pageY - 58) + "px");
+                    // Get current event info
+                    console.log(plot.dataset[i].label + ' : ' + plot.dataset[i].balance);
+
+                    /*  // Get x & y co-ordinates
+                      console.log(d3.mouse(this));*/
+                })
+                .on("mouseout", function(d, i) {
+
+                    div.transition()
+                        .duration(100)
+                        .style("opacity", 0);
+
+
+                });
+            return this;
+        }
+
+        plot.getPosition = coord;
+        plot.getTripple = function(x, y) {
+            //TODO, get percentages for a give x, y
+        }
+
+        return plot;
+    }
+
+
+    d3.csv("données_commune/resulatMatrixDeplacement_plot.csv", function(data) {
+        //ACTIVATE!
+        var plot_opts = {
+            side: $(window).width() / 2.5,
+            margin: { top: 20, left: 110, bottom: 100, right: 100 },
+            axis_labels: ["Actifs se déplaçant sans voiture à l'intérieur de la commune", "Actifs se déplaçant en voiture à l'extérieur de la commune", "Actifs se déplaçant en voiture à l'intérieur de la commune"],
+            axis_ticks: d3.range(0, 11, 2),
+        }
+
+        var tp = ternaryPlot('#plot', plot_opts);
+
+        //Ternary plot 
+        var d = []
+
+        function next() {
+
+            for (var i = 0; i < data.length; i++) {
+                d.push({
+                    Inter_voiture_ternary: parseFloat(data[i].Inter_voiture_ternary),
+                    extra_voiture_ternary: parseFloat(data[i].extra_voiture_ternary),
+                    sansvoiture_ternary: parseFloat(data[i].sansvoiture_ternary),
+                    inter_voiture: parseFloat(data[i].inter_voiture),
+                    extra_voiture: parseFloat(data[i].extra_voiture),
+                    sansvoiture: parseFloat(data[i].extra_sansvoiture),
+                    balance: parseFloat(data[i].Balance),
+                    emplois: parseFloat(data[i].Nombre_actifs_2015),
+                    habitants: parseFloat(data[i].habitants),
+                    label: data[i].commune
+                })
+
+            }
+            tp.data(d, function(d) {
+                return [d.Inter_voiture_ternary, d.extra_voiture_ternary, d.sansvoiture_ternary, d.balance, d.emplois, d.habitants]
+            }, 'label');
+        }
+        next();
+    })
+
+
+
+    var margin = { top: 50, right: 5, bottom: 5, left: 5 };
+
+    var width = $(window).width() / 4 - margin.left - margin.right,
+        height = $(window).height() / 4.5;
+
+    var svg = d3.select('#circleLegend2').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+
+    svg = svg.append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var scale = d3.scale.linear()
+        .domain([0, 87000])
+        .range([3, 40]);
+
+    // 3
+    scale.domain([0, 87000])
+    var circleKey = circleLegend()
+        .scale(scale)
+        .orient("right")
+        .ticks(4)
+
+    svg.append('g')
+        .attr('transform', 'translate(100, 40)')
+        .call(circleKey)
+
+
+    $('#legendTooltip').hide();
+
+    $('#tooltipLegend').on('click', function() {
+
+        if ($("#legendTooltip").is(":visible")) {
+            $('#legendTooltip').hide();
+        } else {
+            $('#legendTooltip').show();
+        }
+    })
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*TERNARY PLOT 2! */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Fonction graphique des cadres,inter,ouvriers
+    function ternaryPlot1(selector, userOpt) {
+
+        var plot = {
+            dataset: []
+        };
+
+        var opt = {
+            width: $(window).width() / 2.5,
+            height: $(window).height(),
+            side: $(window).width(),
+            margin: { top: 70, left: 50, bottom: 50, right: 25 },
+            axis_labels: ['A', 'B', 'C'],
+            axis_ticks: [0, 2, 4, 6, 8, 10],
+            tickLabelMargin: 10,
+            axisLabelMargin: 10
+        }
+
+        for (var o in userOpt) {
+            opt[o] = userOpt[o];
+        }
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        var svg2 = d3.select(selector).append('svg')
+            .attr('id', 'svgTriangle2')
+            .attr("width", opt.width)
+            .attr("height", opt.height);
+
+        var axes = svg2.append('g').attr('class', 'axes');
+
+        var w = opt.side;
+        var h = Math.sqrt(opt.side * opt.side - (opt.side / 2) * (opt.side / 2));
+
+        var corners = [
+            [opt.margin.left, h + opt.margin.top], // a
+            [w + opt.margin.left, h + opt.margin.top], //b 
+            [(w / 2) + opt.margin.left, opt.margin.top], //c 
+        ]
+
+        var labels = [
+            [opt.margin.left + 20, (h / 2) + opt.margin.top - 10, -60], // data
+            [(w / 2) + opt.margin.left + 5, h + opt.margin.top + 50, 0], // eng 
+            [opt.margin.left + w - 20, (h / 2) + opt.margin.top - 10, +60], // designer
+        ]
+
+        //axis names
+        axes.selectAll('.axis-title')
+            .data(opt.axis_labels)
+            .enter()
+            .append('g')
+            .attr('class', 'axis-title')
+            .append('text')
+            .text(function(d) { return d; })
+            .attr('transform', function(d, i) {
+                return 'translate(' + labels[i][0] + ',' + labels[i][1] + ')rotate(' + labels[i][2] + ')';
+                //return 'translate('+corners[i][0]+','+corners[i][1]+')';
+            })
+            .attr('text-anchor', 'middle')
+        var n = opt.axis_ticks.length;
+        var tickLabelLookup = {
+            0: 'Faible',
+            10: 'Fort',
+        };
+        opt.axis_ticks.forEach(function(v) {
+            var coord1 = coord([v, 0, 10 - v]);
+            var coord2 = coord([v, 10 - v, 0]);
+            var coord3 = coord([0, 10 - v, v]);
+            var coord4 = coord([10 - v, 0, v]);
+
+            axes.append("line")
+                .attr(lineAttributes(coord1, coord2))
+                .classed('a-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord2, coord3))
+                .classed('b-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord3, coord4))
+                .classed('c-axis tick', true);
+
+
+            //tick labels
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord1[0] + ',' + coord1[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(-10,0)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[v]; })
+                .classed('a-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord2[0] + ',' + coord2[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(10,20)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[10 - v]; })
+                .classed('b-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord3[0] + ',' + coord3[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(5,0)')
+                .text(function(d) { return tickLabelLookup[v]; })
+                .attr('x', opt.tickLabelMargin)
+                .classed('c-axis tick-text', true);
+
+        })
+
+        function lineAttributes(p1, p2) {
+            return {
+                x1: p1[0],
+                y1: p1[1],
+                x2: p2[0],
+                y2: p2[1]
+            };
+        }
+
+        function coord(arr) {
+            var a = arr[0],
+                b = arr[1],
+                c = arr[2];
+            var sum, pos = [0, 0];
+            sum = a + b + c;
+            if (sum !== 0) {
+                a /= sum;
+                b /= sum;
+                c /= sum;
+                pos[0] = corners[0][0] * a + corners[1][0] * b + corners[2][0] * c;
+                pos[1] = corners[0][1] * a + corners[1][1] * b + corners[2][1] * c;
+            }
+            return pos;
+        }
+
+        //bind by is the dataset property used as an id for the join
+        plot.data = function(data, accessor, bindBy) {
+
+            var circs = [];
+
+
+            plot.dataset = data;
+
+            var circles = svg2.selectAll("circle")
+                .data(data.map(function(d) { return coord(accessor(d)); }), function(d, i) {
+                    if (bindBy) {
+                        if (plot.dataset[i].balance < 0) {
+                            /*  circs.push((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                            circs.push((plot.dataset[i].balance * -1))
+                        } else {
+                            circs.push((plot.dataset[i].balance))
+                        }
+                        return plot.dataset[i][bindBy];
+                    }
+                    return i;
+                });
+            console.log(circs)
+            var rscale = d3.scale.linear()
+                .domain([0, d3.max(circs)])
+                .range([3, 40]);
+
+            circles.enter().append("circle");
+
+            circles.transition().attr("cx", function(d) { return d[0]; })
+                .attr('id', function(d, i) { return plot.dataset[i][bindBy] + 2 })
+                .attr("cy", function(d) { return d[1]; })
+                .attr('fill', function(d, i) {
+                    if (plot.dataset[i].balance < 0) {
+                        return 'red'
+                    } else {
+                        return 'green'
+                    }
+                })
+                .attr("r", function(d, i) {
+                    if (plot.dataset[i].balance > 0) {
+                        var point = plot.dataset[i].balance;
+                        return rscale((point))
+                        /*return rscale((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                    } else {
+                        var point = plot.dataset[i].balance * -1;
+                        return rscale((point))
+                    }
+                });
+
+            circles
+                .on("mouseover", function(d, i) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+                    var balance = (plot.dataset[i].balance).toLocaleString();
+                    var inter_voiture = (plot.dataset[i].inter_voiture).toLocaleString();
+                    var extra_voiture = (plot.dataset[i].extra_voiture).toLocaleString();
+                    var sansvoiture = (plot.dataset[i].sansvoiture).toLocaleString();
+                    div.html('<b> Balance à ' + plot.dataset[i].label + ' : ' + balance +
+                            ' déplacements</b><br>Déplacement interne en voiture: ' + (inter_voiture) +
+                            ' déplacements</b><br>Déplacement externe en voiture: ' + (extra_voiture) +
+                            ' déplacements</b><br>Déplacement sans voiture: ' + (sansvoiture) + ' déplacements')
+                        .style("left", (d3.event.pageX + 58) + "px")
+                        .style("top", (d3.event.pageY - 58) + "px");
+                    // Get current event info
+                    console.log(plot.dataset[i].label + ' : ' + plot.dataset[i].balance);
+
+                    /*  // Get x & y co-ordinates
+                      console.log(d3.mouse(this));*/
+                })
+                .on("mouseout", function(d, i) {
+
+                    div.transition()
+                        .duration(100)
+                        .style("opacity", 0);
+
+
+                });
+            return this;
+        }
+
+        plot.getPosition = coord;
+        plot.getTripple = function(x, y) {
+            //TODO, get percentages for a give x, y
+        }
+
+        return plot;
+    }
+
+
+    d3.csv("données_commune/resulatMatrixDeplacement_plot.csv", function(data) {
+        //ACTIVATE!
+        var plot_opts = {
+            side: $(window).width() / 4,
+            margin: { top: 70, left: 110, bottom: 100, right: 100 },
+            axis_labels: ['"cadres" travaillant dans la commune de résidence', '"prof. inter." travaillant dans la commune de résidence', '"employés/ouvriers" travaillant dans la commune de résidence'],
+            axis_ticks: d3.range(0, 11, 2),
+        }
+
+        var tp = ternaryPlot1('#plot2', plot_opts);
+
+        //Ternary plot 
+        var d = []
+
+        function next() {
+
+            for (var i = 0; i < data.length; i++) {
+                d.push({
+                    cadre_intra_ternary: parseFloat(data[i].cadre_intra_ternary),
+                    inter_intra_ternary: parseFloat(data[i].inter_intra_ternary),
+                    ouvrier_intra_ternary: parseFloat(data[i].ouvrier_intra_ternary),
+                    balance: parseFloat(data[i].Balance),
+                    emplois: parseFloat(data[i].Nombre_actifs_2015),
+                    habitants: parseFloat(data[i].habitants),
+                    label: data[i].commune
+                })
+
+            }
+            tp.data(d, function(d) {
+                return [d.cadre_intra_ternary, d.inter_intra_ternary, d.ouvrier_intra_ternary, d.balance, d.emplois, d.habitants]
+            }, 'label');
+        }
+        next();
+    })
+
+
+
+    var margin = { top: 50, right: 5, bottom: 5, left: 5 };
+
+    var width = $(window).width() / 4 - margin.left - margin.right,
+        height = $(window).height() / 4.5;
+
+    var svg = d3.select('#circleLegend2').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+
+    svg = svg.append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var scale = d3.scale.linear()
+        .domain([0, 87000])
+        .range([3, 40]);
+
+    // 3
+    scale.domain([0, 87000])
+    var circleKey = circleLegend()
+        .scale(scale)
+        .orient("right")
+        .ticks(4)
+
+    svg.append('g')
+        .attr('transform', 'translate(100, 40)')
+        .call(circleKey)
+
+
+    $('#legendTooltip2').hide();
+
+    $('#tooltipLegend2').on('click', function() {
+
+        if ($("#legendTooltip2").is(":visible")) {
+            $('#legendTooltip2').hide();
+        } else {
+            $('#legendTooltip2').show();
+        }
+    })
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*TERNARY 2 BIS! */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Fonction graphique des cadres,inter,ouvriers
+    function ternaryPlot2(selector, userOpt) {
+
+        var plot = {
+            dataset: []
+        };
+
+        var opt = {
+            width: $(window).width() / 2.5,
+            height: $(window).height(),
+            side: $(window).width(),
+            margin: { top: 20, left: 50, bottom: 50, right: 25 },
+            axis_labels: ['A', 'B', 'C'],
+            axis_ticks: [0, 2, 4, 6, 8, 10],
+            tickLabelMargin: 10,
+            axisLabelMargin: 10
+        }
+
+        for (var o in userOpt) {
+            opt[o] = userOpt[o];
+        }
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        var svg3 = d3.select(selector).append('svg')
+            .attr('id', 'svgTriangle2bis')
+            .attr("width", opt.width)
+            .attr("height", opt.height);
+
+        var axes = svg3.append('g').attr('class', 'axes');
+
+        var w = opt.side;
+        var h = Math.sqrt(opt.side * opt.side - (opt.side / 2) * (opt.side / 2));
+
+        var corners = [
+            [opt.margin.left, h + opt.margin.top], // a
+            [w + opt.margin.left, h + opt.margin.top], //b 
+            [(w / 2) + opt.margin.left, opt.margin.top], //c 
+        ]
+
+        var labels = [
+            [opt.margin.left + 20, (h / 2) + opt.margin.top - 10, -60], // data
+            [(w / 2) + opt.margin.left + 5, h + opt.margin.top + 50, 0], // eng 
+            [opt.margin.left + w - 20, (h / 2) + opt.margin.top - 10, +60], // designer
+        ]
+
+        //axis names
+        axes.selectAll('.axis-title')
+            .data(opt.axis_labels)
+            .enter()
+            .append('g')
+            .attr('class', 'axis-title')
+            .append('text')
+            .text(function(d) { return d; })
+            .attr('transform', function(d, i) {
+                return 'translate(' + labels[i][0] + ',' + labels[i][1] + ')rotate(' + labels[i][2] + ')';
+                //return 'translate('+corners[i][0]+','+corners[i][1]+')';
+            })
+            .attr('text-anchor', 'middle')
+        var n = opt.axis_ticks.length;
+        var tickLabelLookup = {
+            0: 'Faible',
+            10: 'Fort',
+        };
+        opt.axis_ticks.forEach(function(v) {
+            var coord1 = coord([v, 0, 10 - v]);
+            var coord2 = coord([v, 10 - v, 0]);
+            var coord3 = coord([0, 10 - v, v]);
+            var coord4 = coord([10 - v, 0, v]);
+
+            axes.append("line")
+                .attr(lineAttributes(coord1, coord2))
+                .classed('a-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord2, coord3))
+                .classed('b-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord3, coord4))
+                .classed('c-axis tick', true);
+
+
+            //tick labels
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord1[0] + ',' + coord1[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(-10,0)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[v]; })
+                .classed('a-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord2[0] + ',' + coord2[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(10,20)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[10 - v]; })
+                .classed('b-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord3[0] + ',' + coord3[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(5,0)')
+                .text(function(d) { return tickLabelLookup[v]; })
+                .attr('x', opt.tickLabelMargin)
+                .classed('c-axis tick-text', true);
+
+        })
+
+        function lineAttributes(p1, p2) {
+            return {
+                x1: p1[0],
+                y1: p1[1],
+                x2: p2[0],
+                y2: p2[1]
+            };
+        }
+
+        function coord(arr) {
+            var a = arr[0],
+                b = arr[1],
+                c = arr[2];
+            var sum, pos = [0, 0];
+            sum = a + b + c;
+            if (sum !== 0) {
+                a /= sum;
+                b /= sum;
+                c /= sum;
+                pos[0] = corners[0][0] * a + corners[1][0] * b + corners[2][0] * c;
+                pos[1] = corners[0][1] * a + corners[1][1] * b + corners[2][1] * c;
+            }
+            return pos;
+        }
+
+        //bind by is the dataset property used as an id for the join
+        plot.data = function(data, accessor, bindBy) {
+
+            var circs = [];
+
+
+            plot.dataset = data;
+
+            var circles = svg3.selectAll("circle")
+                .data(data.map(function(d) { return coord(accessor(d)); }), function(d, i) {
+                    if (bindBy) {
+                        if (plot.dataset[i].balance < 0) {
+                            /*  circs.push((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                            circs.push((plot.dataset[i].balance * -1))
+                        } else {
+                            circs.push((plot.dataset[i].balance))
+                        }
+                        return plot.dataset[i][bindBy];
+                    }
+                    return i;
+                });
+            console.log(circs)
+            var rscale = d3.scale.linear()
+                .domain([0, d3.max(circs)])
+                .range([3, 40]);
+
+            circles.enter().append("circle");
+
+            circles.transition().attr("cx", function(d) { return d[0]; })
+                .attr('id', function(d, i) { return plot.dataset[i][bindBy] + 2 })
+                .attr("cy", function(d) { return d[1]; })
+                .attr('fill', function(d, i) {
+                    if (plot.dataset[i].balance < 0) {
+                        return 'red'
+                    } else {
+                        return 'green'
+                    }
+                })
+                .attr("r", function(d, i) {
+                    if (plot.dataset[i].balance > 0) {
+                        var point = plot.dataset[i].balance;
+                        return rscale((point))
+                        /*return rscale((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )*/
+                    } else {
+                        var point = plot.dataset[i].balance * -1;
+                        return rscale((point))
+                    }
+                });
+
+            circles
+                .on("mouseover", function(d, i) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+                    var balance = (plot.dataset[i].balance).toLocaleString();
+                    var inter_voiture = (plot.dataset[i].inter_voiture).toLocaleString();
+                    var extra_voiture = (plot.dataset[i].extra_voiture).toLocaleString();
+                    var sansvoiture = (plot.dataset[i].sansvoiture).toLocaleString();
+                    div.html('<b> Balance à ' + plot.dataset[i].label + ' : ' + balance +
+                            ' déplacements</b><br>Déplacement interne en voiture: ' + (inter_voiture) +
+                            ' déplacements</b><br>Déplacement externe en voiture: ' + (extra_voiture) +
+                            ' déplacements</b><br>Déplacement sans voiture: ' + (sansvoiture) + ' déplacements')
+                        .style("left", (d3.event.pageX + 58) + "px")
+                        .style("top", (d3.event.pageY - 58) + "px");
+                    // Get current event info
+                    console.log(plot.dataset[i].label + ' : ' + plot.dataset[i].balance);
+
+                    /*  // Get x & y co-ordinates
+                      console.log(d3.mouse(this));*/
+                })
+                .on("mouseout", function(d, i) {
+
+                    div.transition()
+                        .duration(100)
+                        .style("opacity", 0);
+
+
+                });
+            return this;
+        }
+
+        plot.getPosition = coord;
+        plot.getTripple = function(x, y) {
+            //TODO, get percentages for a give x, y
+        }
+
+        return plot;
+    }
+
+
+    d3.csv("données_commune/resulatMatrixDeplacement_plot.csv", function(data) {
+        //ACTIVATE!
+        var plot_opts = {
+            side: $(window).width() / 4,
+            margin: { top: 70, left: 110, bottom: 100, right: 100 },
+            axis_labels: ['"cadres" travaillant en dehors de la commune de résidence', '"prof. inter." travaillant en dehors de la commune de résidence', '"employés/ouvriers" travaillant en dehors de la commune de résidence'],
+            axis_ticks: d3.range(0, 11, 2),
+        }
+
+        var tp = ternaryPlot2('#plot2bis', plot_opts);
+
+        //Ternary plot 
+        var d = []
+
+        function next() {
+
+            for (var i = 0; i < data.length; i++) {
+                d.push({
+                    cadre_extra_ternary: parseFloat(data[i].cadre_extra_ternary),
+                    inter_extra_ternary: parseFloat(data[i].inter_extra_ternary),
+                    ouvrier_extra_ternary: parseFloat(data[i].ouvrier_extra_ternary),
+                    balance: parseFloat(data[i].Balance),
+                    emplois: parseFloat(data[i].Nombre_actifs_2015),
+                    habitants: parseFloat(data[i].habitants),
+                    label: data[i].commune
+                })
+
+            }
+            tp.data(d, function(d) {
+                return [d.cadre_extra_ternary, d.inter_extra_ternary, d.ouvrier_extra_ternary, d.balance, d.emplois, d.habitants]
+            }, 'label');
+        }
+        next();
+    })
+
+
+
+    var margin = { top: 70, right: 5, bottom: 5, left: 5 };
+
+    var width = $(window).width() / 4 - margin.left - margin.right,
+        height = $(window).height() / 4.5;
+
+    var svg = d3.select('#circleLegend').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+
+    svg = svg.append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var scale = d3.scale.linear()
+        .domain([0, 87000])
+        .range([3, 40]);
+
+    // 3
+    scale.domain([0, 87000])
+    var circleKey = circleLegend()
+        .scale(scale)
+        .orient("right")
+        .ticks(4)
+
+    svg.append('g')
+        .attr('transform', 'translate(100, 40)')
+        .call(circleKey)
+
+
+    $('#legendTooltip2').hide();
+
+    $('#tooltipLegend2').on('click', function() {
+
+        if ($("#legendTooltip2").is(":visible")) {
+            $('#legendTooltip2').hide();
+        } else {
+            $('#legendTooltip2').show();
+        }
+    })
+
+
+
+    var scatterPlot = ScatterPlot();
+
+    scatterPlot
+        .outerWidth(960)
+        .outerHeight(500)
+        .margin({ left: 95, top: 5, right: 10, bottom: 85 })
+        .xColumn("total_CO2_pers")
+        .xAxisLabel("Emissions de CO2 par personne (en g)")
+        .xAxisLabelOffset(70)
+        .xTicks(20)
+        .yColumn("total_min_auto_pers")
+        .yAxisLabel("Durée moyenne du trajet domicile-travail (en minutes)")
+        .yAxisLabelOffset(50)
+        .yTicks(20)
+        .colorColumn("")
+        .rColumn("total_personne_entrante") // "r" stands for radius
+        .rMin(2)
+        .rMax(13)
+        .colorRange(["#00c65c", "#8400c6", "#e54100"]);
+
+
+    function type(d) {
+        d.total_min_auto_pers = +d.total_min_auto_pers;
+        d.total_CO2_pers = +d.total_CO2_pers;
+        d.total_personne_entrante = +d.total_personne_entrante;
+        d.Emploi = +d.Emploi;
+        d.total_km_auto_pers = +d.total_km_auto_pers;
+        return d;
+    }
+
+    d3.csv("donnees_commune/dataScatterPlot.csv", type, function(data) {
+        d3.select("#scatterPlot")
+            .datum(data)
+            .call(scatterPlot);
+    });
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /*TREE MAP! */
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+setTimeout(function() {
+
+    window.addEventListener('message', function(e) {
+        var opts = e.data.opts,
+            data = e.data.data;
+
+        return main(opts, data);
+    });
+
+    var defaults = {
+        margin: { top: 24, right: 0, bottom: 0, left: 0 },
+        rootname: "TOP",
+        format: "d",
+        title: "",
+        width: $(window).width() / 2,
+        height: $(window).height() / 1.5
+    };
+
+    function main(o, data) {
+        var root,
+            opts = $.extend(true, {}, defaults, o),
+            formatNumber = d3.format(opts.format),
+            rname = opts.rootname,
+            margin = opts.margin,
+            theight = 36 + 16;
+
+        $('#chart').width(opts.width).height(opts.height);
+        var width = opts.width - margin.left - margin.right,
+            height = opts.height - margin.top - margin.bottom,
+            transitioning;
+
+        var colorSSS = d3.scale.category10();
+
+
+        // green, blue, yellow, orange, red
+        var colors = ['#99B898', '#FF847C', '#FECEA8'];
+
+        // Do not include a domain
+        var color = d3.scale.ordinal()
+            .range(colors);
+
+        var x = d3.scale.linear()
+            .domain([0, width])
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .domain([0, height])
+            .range([0, height]);
+
+        var treemap = d3.layout.treemap()
+            .children(function(d, depth) { return depth ? null : d._children; })
+            .sort(function(a, b) { return a.value - b.value; })
+            .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
+            .round(false);
+
+        // Define the div for the tooltip
+        var div4 = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        var svg = d3.select("#chart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.bottom + margin.top)
+            .style("margin-left", -margin.left + "px")
+            .style("margin.right", -margin.right + "px")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .style("shape-rendering", "crispEdges");
+
+        var grandparent = svg.append("g")
+            .attr("class", "grandparent");
+
+        grandparent.append("rect")
+            .attr("y", -margin.top)
+            .attr("width", width)
+            .attr("height", margin.top);
+
+        grandparent.append("text")
+            .attr("x", 6)
+            .attr("y", 6 - margin.top)
+            .attr("dy", ".75em");
+
+        if (opts.title) {
+            $("#chart").prepend("<p class='title'>" + opts.title + "</p>");
+        }
+        if (data instanceof Array) {
+            root = { key: rname, values: data };
+        } else {
+            root = data;
+        }
+
+        if (window.parent !== window) {
+            var myheight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            window.parent.postMessage({ height: myheight }, '*');
+        }
+
+        function initialize(root) {
+            root.x = root.y = 0;
+            root.dx = width;
+            root.dy = height;
+            root.depth = 0;
+        }
+
+        initialize(root);
+        accumulate(root);
+        layout(root);
+        console.log(root);
+        display(root);
+
+        // Aggregate the values for internal nodes. This is normally done by the
+        // treemap layout, but not here because of our custom implementation.
+        // We also take a snapshot of the original children (_children) to avoid
+        // the children being overwritten when when layout is computed.
+        function accumulate(d) {
+            return (d._children = d.values) ?
+                d.value = d.values.reduce(function(p, v) { return p + accumulate(v); }, 0) :
+                d.value;
+        }
+
+        // Compute the treemap layout recursively such that each group of siblings
+        // uses the same size (1×1) rather than the dimensions of the parent cell.
+        // This optimizes the layout for the current zoom state. Note that a wrapper
+        // object is created for the parent node for each group of siblings so that
+        // the parent’s dimensions are not discarded as we recurse. Since each group
+        // of sibling was laid out in 1×1, we must rescale to fit using absolute
+        // coordinates. This lets us use a viewport to zoom.
+        function layout(d) {
+            if (d._children) {
+                treemap.nodes({ _children: d._children });
+                d._children.forEach(function(c) {
+                    c.x = d.x + c.x * d.dx;
+                    c.y = d.y + c.y * d.dy;
+                    c.dx *= d.dx;
+                    c.dy *= d.dy;
+                    c.parent = d;
+                    layout(c);
+                });
+            }
+        }
+
+        function display(d) {
+            grandparent
+                .datum(d.parent)
+                .on("click", transition)
+                .select("text")
+                .text(name(d));
+
+            var g1 = svg.insert("g", ".grandparent")
+                .datum(d)
+                .attr("class", "depth");
+
+            var g = g1.selectAll("g")
+                .data(d._children)
+                .enter().append("g");
+
+            g.filter(function(d) { return d._children; })
+                .classed("children", true)
+                .on("click", transition);
+
+            var children = g.selectAll(".child")
+                .data(function(d) { return d._children || [d]; })
+                .enter().append("g");
+
+            children.append("rect")
+                .attr("class", "child")
+                .call(rect)
+                .append("title")
+                .text(function(d) { return d.key + " (" + formatNumber(d.value) + ")"; });
+            children.append("text")
+                .attr("class", "ctext")
+                .text(function(d) { return d.key; })
+                .call(text2);
+
+            g.append("rect")
+                .attr("class", "parent")
+                .call(rect);
+
+            var t = g.append("text")
+                .attr("class", "ptext")
+                .attr("dy", ".75em")
+
+            t.append("tspan")
+                .text(function(d) { return d.key; });
+            t.append("tspan")
+                .attr("dy", "1.0em")
+                .text(function(d) { return formatNumber(d.value); });
+            t.call(text);
+
+            g.selectAll("rect")
+                .style("fill", function(d) {
+                    if (d.categorie_majoritaire == undefined) {
+                        return colorSSS(d.key)
+                    } else {
+                        return color(d.categorie_majoritaire);
+                    }
+                });
+
+
+            g
+                .on("mouseover", function(d, i) {
+                    div4.transition()
+                        .duration(200)
+                        .style("opacity", 1);
+                    var value = (d.value).toLocaleString();
+                    if (d.key != undefined) {
+                        div4.html('<div style="background-color:rgba(255,255,255,0.7)"><b>' + d.key +
+                                ' </b><br>CSP majoritaire dans les déplacements externes : ' + (d.categorie_majoritaire) +
+                                '<br> Nombre de déplacements à destination de ' + d.subregion + ' : ' + value + "</div>"
+                            )
+                            .style("left", (d3.event.pageX + 108) + "px")
+                            .style("top", (d3.event.pageY - 58) + "px");
+
+                        /*  // Get x & y co-ordinates
+                          console.log(d3.mouse(this));*/
+                    }
+
+                })
+                .on("mouseout", function(d, i) {
+
+                    div4.transition()
+                        .duration(100)
+                        .style("opacity", 0);
+
+
+                });
+
+            function transition(d) {
+                if (transitioning || !d) return;
+                transitioning = true;
+
+                var g2 = display(d),
+                    t1 = g1.transition().duration(750),
+                    t2 = g2.transition().duration(750);
+
+                // Update the domain only after entering new elements.
+                x.domain([d.x, d.x + d.dx]);
+                y.domain([d.y, d.y + d.dy]);
+
+                // Enable anti-aliasing during the transition.
+                svg.style("shape-rendering", null);
+
+                // Draw child nodes on top of parent nodes.
+                svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
+
+                // Fade-in entering text.
+                g2.selectAll("text").style("fill-opacity", 0);
+
+                // Transition to the new view.
+                t1.selectAll(".ptext").call(text).style("fill-opacity", 0);
+                t1.selectAll(".ctext").call(text2).style("fill-opacity", 0);
+                t2.selectAll(".ptext").call(text).style("fill-opacity", 1);
+                t2.selectAll(".ctext").call(text2).style("fill-opacity", 1);
+                t1.selectAll("rect").call(rect);
+                t2.selectAll("rect").call(rect);
+
+                // Remove the old node when the transition is finished.
+                t1.remove().each("end", function() {
+                    svg.style("shape-rendering", "crispEdges");
+                    transitioning = false;
+                });
+            }
+
+            return g;
+        }
+
+        function text(text) {
+            text.selectAll("tspan")
+                .attr("x", function(d) { return x(d.x) + 6; })
+            text.attr("x", function(d) { return x(d.x) + 6; })
+                .attr("y", function(d) { return y(d.y) + 6; })
+                .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+        }
+
+        function text2(text) {
+            text.attr("x", function(d) { return x(d.x + d.dx) - this.getComputedTextLength() - 6; })
+                .attr("y", function(d) { return y(d.y + d.dy) - 6; })
+                .style("opacity", function(d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+        }
+
+        function rect(rect) {
+            rect.attr("x", function(d) { return x(d.x); })
+                .attr("y", function(d) { return y(d.y); })
+                .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+                .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+        }
+
+        function name(d) {
+            return d.parent ?
+                name(d.parent) + " / " + d.key + " (" + formatNumber(d.value) + ")" :
+                d.key + " (" + formatNumber(d.value) + ")";
+        }
+    }
+
+    if (window.location.hash === "") {
+        d3.json("data.json", function(err, res) {
+            if (!err) {
+                console.log(res);
+                var data = d3.nest().key(function(d) { return d.subregion; }).entries(res);
+                main({ title: "" }, { key: "Région Occitanie", values: data });
+            }
+        });
+    }
+
+}, 3000)
+    </script>
+</body>
+
+</html>

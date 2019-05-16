@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+   integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+   crossorigin=""></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <button id="create">Create file</button> 
+    <div id='map'></div>
+    <script>
+  
+
+
+    var tile = 'data_par_trajet-dgqfqo'
+    var url = 'mapbox://tonyh70.9n1edek3'
+    mapboxgl.accessToken = 'pk.eyJ1IjoidG9ueWg3MCIsImEiOiJCd2NPU2pVIn0.IvZwW3UjZRpcobZK1-QfdQ';
+  
+    /*    // set the bounds of the map
+        var bounds = [
+            [-0.762835741, 42.3920234558],
+            [4.9610412121, 46.1122782548]
+        ];
+        [[[-0.762835741,42.3920234558],[4.9610412121,42.3920234558],[4.9610412121,46.1122782548],[-0.762835741,46.1122782548],[-0.762835741,42.3920234558]]]
+        map.setMaxBounds(bounds);*/
+
+    // initialize the map canvas to interact with later
+
+    //Initialisation des variables globales
+    var count = 0;
+    var trajet = [];
+    var lineTrajet = [];
+    var start = [];
+    var end = [];
+    var goAnimation;
+    var allPoints;
+    var line = [];
+
+    // create a function to make a directions request
+    function getRoute(start, end, qtite_extra,ville_depart,ville_arrivee) {
+       
+
+        // make directions request using cycling profile
+        // an arbitrary start will always be the same
+        // only the end or destination will change
+        var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&overview=full&&access_token=' + mapboxgl.accessToken;
+
+        // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+        var req = new XMLHttpRequest();
+        req.responseType = 'json';
+        req.open('GET', url, true);
+        req.onload = function() {
+             count++
+            var data = req.response.routes[0];
+            var route = data.geometry.coordinates;
+            var geojson = {
+                "type": "Feature",
+                "properties": {'qtite_extra':qtite_extra,
+                               'ville_arrivee':ville_arrivee,
+                                'ville_depart': ville_depart},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": route
+                }
+            };
+            lineTrajet.push(geojson);
+            console.log(count)
+            /*var line = JSON.stringify(lineTrajet);*/
+           
+            localStorage.setItem('trajet', JSON.stringify(lineTrajet))
+              
+        };
+
+        req.send();
+    }
+
+
+        d3.csv("donnees_trajet/par_trajet5.csv", function(error, data) {
+
+            $.each(data, function(i, item) {
+                var longitude = data[i].longitude;
+                var latitude = data[i].latitude;
+                var travail_longitude = data[i].travail_longitude;
+                var travail_latitude = data[i].travail_latitude;
+                var start = [longitude, latitude];
+                var end = [travail_longitude, travail_latitude];
+                var qtite_extra = data[i].extra_travail_commune_2014
+                var ville_depart = data[i].commune
+                var ville_arrivee = data[i].travail_commune
+                getRoute(start, end,qtite_extra,ville_arrivee,ville_depart);
+            })
+            /*var goAnimation = setInterval(getAnimation, 4000);*/
+        })
+   
+
+
+
+    </script>
+</body>
+
+</html>

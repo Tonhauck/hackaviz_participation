@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .listing-group {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        font-weight: 600;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+        border-radius: 3px;
+        max-width: 20%;
+        color: #fff;
+    }
+
+    h2 {
+        font: 20px 'Helvetica Neue', Arial, Helvetica, sans-serif !important;
+    }
+
+    *,
+    *:before,
+    *:after {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        background: #ecf0f1;
+        color: #444;
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .button-switch {
+        font-size: 1.5em;
+        height: 1.875em;
+        margin-bottom: 0.625em;
+        position: relative;
+        width: 7em;
+    }
+
+    .button-switch .lbl-off,
+    .button-switch .lbl-on {
+        cursor: pointer;
+        display: block;
+        font-size: 0.9em;
+        font-weight: bold;
+        line-height: 1em;
+        position: absolute;
+        top: 0.5em;
+        transition: opacity 0.25s ease-out 0.1s;
+        text-transform: uppercase;
+    }
+
+    .button-switch .lbl-off {
+        right: 0.4375em;
+    }
+
+    .button-switch .lbl-on {
+        color: #fefefe;
+        opacity: 0;
+        left: 0.4375em;
+    }
+
+    .button-switch .switch {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        height: 0;
+        font-size: 1em;
+        left: 0;
+        line-height: 0;
+        outline: none;
+        position: absolute;
+        top: 0;
+        width: 0;
+    }
+
+    .button-switch .switch:before,
+    .button-switch .switch:after {
+        content: '';
+        font-size: 1em;
+        position: absolute;
+    }
+
+    .button-switch .switch:before {
+        border-radius: 1.25em;
+        background: #3498db;
+        height: 1.875em;
+        left: -0.25em;
+        top: -0.1875em;
+        transition: background-color 0.25s ease-out 0.1s;
+        width: 7em;
+    }
+
+    .button-switch .switch:after {
+        box-shadow: 0 0.0625em 0.375em 0 #666;
+        border-radius: 50%;
+        background: #fefefe;
+        height: 1.5em;
+        transform: translate(0, 0);
+        transition: transform 0.25s ease-out 0.1s;
+        width: 1.5em;
+    }
+
+    .button-switch .switch:checked:after {
+        transform: translate(5em, 0);
+    }
+
+    .button-switch .switch:checked~.lbl-off {
+        opacity: 0;
+    }
+
+    .button-switch .switch:checked~.lbl-on {
+        opacity: 1;
+    }
+
+    .button-switch .switch#switch-orange:checked:before {
+        background: #e67e22;
+    }
+
+    .fit-picture {
+        width: 40%;
+    }
+
+    .row {
+        margin: 2em;
+    }
+
+    .fiche_profil {
+        color: black;
+    }
+
+
+
+    /*Ternary style*/
+    a {
+        font-family: sans-serif;
+        color: #DB7365;
+        padding: 0.3rem;
+    }
+
+    a:hover {
+        background-color: #DB7365;
+        color: #fff1e0;
+    }
+
+    body {
+
+        background: #fff;
+    }
+
+    line.tick {
+        stroke-width: 0.5;
+        stroke-opacity: 0.5
+    }
+
+    line.minor-tick {
+        stroke-width: 1;
+        stroke-opacity: 0;
+    }
+
+    .a-axis,
+    .b-axis,
+    .c-axis {
+        stroke: #484848;
+    }
+
+    .axis-title {
+        font-family: sans-serif;
+        font-size: 1.5rem;
+    }
+
+    text.tick-text {
+        font-family: sans-serif;
+        font-weight: 200;
+        font-size: 1rem;
+        fill: #484848;
+        stroke: none;
+    }
+
+    circle {
+        /*        fill: #00A699;*/
+        fill-opacity: 0.5;
+        stroke: none;
+    }
+    </style>
+
+<body>
+    <div id="plot">
+    </div>
+    <script>
+    //Fonction graphique des cadres,inter,ouvriers
+    function ternaryPlot(selector, userOpt) {
+
+        var plot = {
+            dataset: []
+        };
+
+        var opt = {
+            width: 900,
+            height: 900,
+            side: 700,
+            margin: { top: 50, left: 50, bottom: 50, right: 50 },
+            axis_labels: ['A', 'B', 'C'],
+            axis_ticks: [0, 2, 4, 6, 8, 10],
+            tickLabelMargin: 10,
+            axisLabelMargin: 40
+        }
+
+        for (var o in userOpt) {
+            opt[o] = userOpt[o];
+        }
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        var svg = d3.select(selector).append('svg')
+            .attr("width", opt.width)
+            .attr("height", opt.height);
+
+        var axes = svg.append('g').attr('class', 'axes');
+
+        var w = opt.side;
+        var h = Math.sqrt(opt.side * opt.side - (opt.side / 2) * (opt.side / 2));
+
+        var corners = [
+            [opt.margin.left, h + opt.margin.top], // a
+            [w + opt.margin.left, h + opt.margin.top], //b 
+            [(w / 2) + opt.margin.left, opt.margin.top], //c 
+        ]
+
+        var labels = [
+            [opt.margin.left + 20, (h / 2) + opt.margin.top - 10, -60], // data
+            [(w / 2) + opt.margin.left + 5, h + opt.margin.top + 50, 0], // eng 
+            [opt.margin.left + w - 20, (h / 2) + opt.margin.top - 10, +60], // designer
+        ]
+
+        //axis names
+        axes.selectAll('.axis-title')
+            .data(opt.axis_labels)
+            .enter()
+            .append('g')
+            .attr('class', 'axis-title')
+            .append('text')
+            .text(function(d) { return d; })
+            .attr('transform', function(d, i) {
+                return 'translate(' + labels[i][0] + ',' + labels[i][1] + ')rotate(' + labels[i][2] + ')';
+                //return 'translate('+corners[i][0]+','+corners[i][1]+')';
+            })
+            .attr('text-anchor', 'middle')
+        var n = opt.axis_ticks.length;
+        var tickLabelLookup = {
+            0: 'low',
+            10: 'high',
+        };
+        opt.axis_ticks.forEach(function(v) {
+            var coord1 = coord([v, 0, 10 - v]);
+            var coord2 = coord([v, 10 - v, 0]);
+            var coord3 = coord([0, 10 - v, v]);
+            var coord4 = coord([10 - v, 0, v]);
+
+            axes.append("line")
+                .attr(lineAttributes(coord1, coord2))
+                .classed('a-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord2, coord3))
+                .classed('b-axis tick', true);
+
+            axes.append("line")
+                .attr(lineAttributes(coord3, coord4))
+                .classed('c-axis tick', true);
+
+
+            //tick labels
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord1[0] + ',' + coord1[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(-10,0)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[v]; })
+                .classed('a-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord2[0] + ',' + coord2[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(10,20)')
+                .attr('text-anchor', 'middle')
+                .attr('x', -opt.tickLabelMargin)
+                .text(function(d) { return tickLabelLookup[10 - v]; })
+                .classed('b-axis tick-text', true);
+
+            axes.append('g')
+                .attr('transform', function(d) {
+                    return 'translate(' + coord3[0] + ',' + coord3[1] + ')'
+                })
+                .append("text")
+                .attr('transform', 'rotate(0)translate(5,0)')
+                .text(function(d) { return tickLabelLookup[v]; })
+                .attr('x', opt.tickLabelMargin)
+                .classed('c-axis tick-text', true);
+
+        })
+
+        function lineAttributes(p1, p2) {
+            return {
+                x1: p1[0],
+                y1: p1[1],
+                x2: p2[0],
+                y2: p2[1]
+            };
+        }
+
+        function coord(arr) {
+            var a = arr[0],
+                b = arr[1],
+                c = arr[2];
+            var sum, pos = [0, 0];
+            sum = a + b + c;
+            if (sum !== 0) {
+                a /= sum;
+                b /= sum;
+                c /= sum;
+                pos[0] = corners[0][0] * a + corners[1][0] * b + corners[2][0] * c;
+                pos[1] = corners[0][1] * a + corners[1][1] * b + corners[2][1] * c;
+            }
+            return pos;
+        }
+
+        //bind by is the dataset property used as an id for the join
+        plot.data = function(data, accessor, bindBy) {
+
+            var circs = [];
+
+
+            plot.dataset = data;
+
+            var circles = svg.selectAll("circle")
+                .data(data.map(function(d) { return coord(accessor(d)); }), function(d, i) {
+                    if (bindBy) {
+                        if (plot.dataset[i].balance > 0) {
+                            circs.push((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )
+                         
+                       /*     circs.push((plot.dataset[i].balance))*/
+                        }
+                        return plot.dataset[i][bindBy];
+                    }
+                    return i;
+                });
+                console.log(circs)
+            var rscale = d3.scale.linear()
+                .domain([0, d3.max(circs)])
+                .range([3, 10]);
+
+            circles.enter().append("circle");
+
+            circles.transition().attr("cx", function(d) { return d[0]; })
+                .attr('id', function(d, i) { return plot.dataset[i].label })
+                .attr("cy", function(d) { return d[1]; })
+                .attr('fill', function(d, i) {
+                    if (plot.dataset[i].balance > 0) {
+                        return 'green'
+                    }
+                })
+                .attr("r", function(d, i) {
+                    if (plot.dataset[i].balance > 0) {
+                        var point = plot.dataset[i].balance;
+                        console.log(point + ' : '+ rscale(point));
+                        /*return rscale((point) )*/
+                        return rscale((plot.dataset[i].emplois / plot.dataset[i].habitants)*100 )
+                    }
+                   
+                });
+
+            d3.selectAll("circle")
+                .on("mouseover", function(d, i) {
+                    d3.select(this)
+                        .style("background-color", "orange");
+
+                    // Get current event info
+                    console.log(plot.dataset[i].label + ' : ' + (plot.dataset[i].emplois / plot.dataset[i].habitants)*100 );
+
+                    /*  // Get x & y co-ordinates
+                      console.log(d3.mouse(this));*/
+                })
+                .on("mouseout", function() {
+                    d3.select(this)
+                        .style("background-color", "steelblue")
+                });
+            return this;
+        }
+
+        plot.getPosition = coord;
+        plot.getTripple = function(x, y) {
+            //TODO, get percentages for a give x, y
+        }
+
+        return plot;
+    }
+
+
+    d3.csv("données_commune/resulatMatrixDeplacement_plot.csv", function(data) {
+        //ACTIVATE!
+        var plot_opts = {
+            side: 600,
+            margin: { top: 70, left: 150, bottom: 150, right: 150 },
+            axis_labels: ['cadre_inter', 'inter_inter', 'ouvrier_inter'],
+            axis_ticks: d3.range(0, 11, 2),
+        }
+
+        var tp = ternaryPlot('#plot', plot_opts);
+
+        //Ternary plot 
+        var d = []
+
+        function next() {
+
+            for (var i = 0; i < data.length; i++) {
+                d.push({
+                    cadre_inter: parseFloat(data[i].cadre_inter),
+                    inter_inter: parseFloat(data[i].inter_inter),
+                    ouvrier_inter: parseFloat(data[i].ouvrier_inter),
+                    balance: parseFloat(data[i].Balance
+
+                    ),
+                    emplois: parseFloat(data[i].Nombre_actifs_2015),
+                    habitants: parseFloat(data[i].habitants),
+                    label: data[i].commune
+                })
+
+            }
+            tp.data(d, function(d) {
+                return [d.cadre_inter, d.inter_inter, d.ouvrier_inter, d.balance, d.emplois, d.habitants]
+            }, 'label');
+        }
+        next();
+    })
+
+    //
+    </script>
+</body>
+
+</html>

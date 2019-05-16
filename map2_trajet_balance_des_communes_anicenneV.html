@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidG9ueWg3MCIsImEiOiJCd2NPU2pVIn0.IvZwW3UjZRpcobZK1-QfdQ';
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/dark-v9', //stylesheet location
+        center: [1.43, 43.600000],
+        zoom: 1
+    });
+
+    map.on('load', function() {
+        map.addLayer({
+            'id': 'balance',
+            'type': 'circle',
+            "source": {
+                "type": 'geojson',
+                "data": 'données_commune/par_communev4.geojson' // replace this with the url of your own geojson
+            },
+            'paint': {
+                'circle-radius': {
+                    property: 'Balance',
+                    stops: [
+                        [{ zoom: 8, value: -5000 }, 20],
+                        [{ zoom: 8, value: -2500 }, 10],
+                        [{ zoom: 8, value: -250 }, 5],
+                        [{ zoom: 8, value: 0 }, 3],
+                        [{ zoom: 8, value: 2500 }, 5],
+                        [{ zoom: 8, value: 50000 }, 10],
+                        [{ zoom: 8, value: 90000 }, 20],
+                        [{ zoom: 13, value: -5000 }, 20],
+                        [{ zoom: 13, value: -2500 }, 10],
+                        [{ zoom: 13, value: -250 }, 5],
+                        [{ zoom: 13, value: 0 }, 3],
+                        [{ zoom: 13, value: 2500 }, 5],
+                        [{ zoom: 13, value: 50000 }, 10],
+                        [{ zoom: 13, value: 90000 }, 20]
+                    ]
+                }
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>
